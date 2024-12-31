@@ -29,12 +29,12 @@ namespace Data
             {
                 wishList
                     .HasOne(w => w.Usuario)
-                    .WithMany(u => u.WishLists)
-                    .HasForeignKey(w => w.UsuarioId);
+                    .WithOne(u => u.WishList)
+                    .HasForeignKey<WishList>(w => w.UsuarioId);
 
                 wishList
                     .HasMany(w => w.Productos)
-                    .WithMany(p => p.WishList)
+                    .WithMany()
                     .UsingEntity(j => j.ToTable("WishListProducto"));
             });
         }

@@ -9,7 +9,6 @@ namespace Model.Entity
         [Required][MaxLength(128)] public string NombreProducto { get; set; }
         [Required] public string Descripcion { get; set; }
         [Required] public double Precio { get; set; }
-        public virtual ICollection<WishList> WishList { get; set; }
 
         public Producto() { }
 
@@ -18,7 +17,6 @@ namespace Model.Entity
             NombreProducto = producto.NombreProducto;
             Descripcion = producto.Descripcion;
             Precio = producto.Precio;
-            WishList = new List<WishList>();
         }
     }
 }
