@@ -9,6 +9,6 @@ namespace Model.Entity
         [Required][MaxLength(80)] public string Nombre { get; set; }
         [Required] public string Contrasena { get; set; }
         [Required][EmailAddress] public string Email { get; set; }
-        public virtual WishList WishList { get; set; }
+        public virtual WishList WishList { get; set; } = new WishList();
     }
 }

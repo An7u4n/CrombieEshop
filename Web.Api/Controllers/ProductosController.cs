@@ -50,7 +50,7 @@ namespace Web.Api.Controllers
             try
             {
                 _productoService.GuardarProducto(productoDTO);
-                return Ok("Producto guardado correctamente");
+                return Created();
             }
             catch (Exception ex)
             {
