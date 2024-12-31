@@ -1,5 +1,9 @@
 using Data;
+using Data.Repository;
+using Data.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Service;
+using Service.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +14,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Web.Api")));
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
 
 var app = builder.Build();
 

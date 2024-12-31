@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Model.DTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model.Entity
 {
@@ -9,5 +10,15 @@ namespace Model.Entity
         [Required] public string Descripcion { get; set; }
         [Required] public double Precio { get; set; }
         public virtual ICollection<WishList> WishList { get; set; }
+
+        public Producto() { }
+
+        public Producto(ProductoDTO producto)
+        {
+            NombreProducto = producto.NombreProducto;
+            Descripcion = producto.Descripcion;
+            Precio = producto.Precio;
+            WishList = new List<WishList>();
+        }
     }
 }
