@@ -9,10 +9,12 @@ namespace Service
     public class UsuarioService : IUsuarioService
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IWishListItemsRepository _wishListItemsRepository;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository)
         {
             _usuarioRepository = usuarioRepository;
+            _wishListItemsRepository = wishListItemsRepository;
         }
 
         public void CrearUsuario(UsuarioDTO usuarioDTO)
@@ -61,6 +63,36 @@ namespace Service
             usuario.Email = usuarioDTO.Email;
 
             _usuarioRepository.ActualizarUsuario(usuario);
+        }
+
+        void IUsuarioService.AgregarItemsWishList(int idUsuario, int idProducto)
+        {
+            _wishListItemsRepository.AgregarProductoWishList(idUsuario, idProducto);
+
+        }
+
+        void IUsuarioService.EliminarItemsWishList(int idUsuario, int idProducto)
+        {
+            _wishListItemsRepository.EliminarProductoWishList(idUsuario, idProducto);
+        }
+
+        ICollection<ProductoDTO> IUsuarioService.ListarItemsWishList(int idUsuario)
+        {
+            var productos = _wishListItemsRepository.ObtenerProductosWishList(idUsuario);
+            var productosDTO = new List<ProductoDTO>();
+            foreach (var producto in productos)
+            {
+                var productoDTO = new ProductoDTO
+                {
+                    Id = producto.Id,
+                    NombreProducto = producto.NombreProducto,
+                    Descripcion = producto.Descripcion,
+                    Precio = producto.Precio
+                };
+
+                productosDTO.Add(productoDTO);
+            }
+            return productosDTO;
         }
     }
 }

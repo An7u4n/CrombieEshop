@@ -46,5 +46,44 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpGet("{id}/wishlist")]
+        public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
+        {
+            try
+            {
+                var productos = _usuarioService.ListarItemsWishList(id);
+                return Ok(productos);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpPost("{id}/wishlist/{idProducto}")]
+        public ActionResult AgregarItemAWishList(int id,int idProducto)
+        {
+            try
+            {
+                _usuarioService.AgregarItemsWishList(id, idProducto);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpDelete("{id}/wishlist/{idProducto}")]
+        public ActionResult EliminarItemWishList(int id, int idProducto)
+        {
+            try
+            {
+                _usuarioService.EliminarItemsWishList(id, idProducto);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
