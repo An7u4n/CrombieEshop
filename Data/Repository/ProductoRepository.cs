@@ -21,10 +21,11 @@ namespace Data.Repository
             return _context.Productos.FirstOrDefault(p => p.Id == idProducto);
         }
 
-        public void GuardarProducto(Producto producto)
+        public Producto CrearProducto(Producto producto)
         {
             _context.Productos.Add(producto);
             _context.SaveChanges();
+            return producto;
         }
 
         public void ActualizarProducto(Producto producto)

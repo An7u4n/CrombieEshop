@@ -80,19 +80,7 @@ namespace Service
         ICollection<ProductoDTO> IUsuarioService.ListarItemsWishList(int idUsuario)
         {
             var productos = _wishListItemsRepository.ObtenerProductosWishList(idUsuario);
-            var productosDTO = new List<ProductoDTO>();
-            foreach (var producto in productos)
-            {
-                var productoDTO = new ProductoDTO
-                {
-                    Id = producto.Id,
-                    NombreProducto = producto.NombreProducto,
-                    Descripcion = producto.Descripcion,
-                    Precio = producto.Precio
-                };
-
-                productosDTO.Add(productoDTO);
-            }
+            var productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
             return productosDTO;
         }
     }

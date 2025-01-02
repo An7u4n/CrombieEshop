@@ -20,18 +20,7 @@ namespace Service
 
             if (productos == null) throw new Exception("No se han encontrado productos");
 
-            foreach (var producto in productos)
-            {
-                var productoDTO = new ProductoDTO
-                {
-                    Id = producto.Id,
-                    NombreProducto = producto.NombreProducto,
-                    Descripcion = producto.Descripcion,
-                    Precio = producto.Precio
-                };
-
-                productosDTO.Add(productoDTO);
-            }
+            productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
 
             return productosDTO;
         }
@@ -45,22 +34,18 @@ namespace Service
                 throw new Exception("Producto no encontrado");
             }
 
-            var productoDTO = new ProductoDTO
-            {
-                Id = producto.Id,
-                NombreProducto = producto.NombreProducto,
-                Descripcion = producto.Descripcion,
-                Precio = producto.Precio
-            };
+            var productoDTO = new ProductoDTO(producto);
 
             return productoDTO;
         }
 
-        public void GuardarProducto(ProductoDTO productoDTO)
+        public ProductoDTO CrearProducto(ProductoDTO productoDTO)
         {
             var producto = new Producto(productoDTO);
 
-            _productoRepository.GuardarProducto(producto);
+            var productoCreado = _productoRepository.CrearProducto(producto);
+
+            return new ProductoDTO(productoCreado);
         }
 
         public void ActualizarProducto(ProductoDTO productoDTO)

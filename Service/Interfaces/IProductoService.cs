@@ -6,7 +6,7 @@ namespace Service.Interfaces
     {
         void ActualizarProducto(ProductoDTO productoDTO);
         void EliminarProducto(int idProducto);
-        void GuardarProducto(ProductoDTO productoDTO);
+        ProductoDTO CrearProducto(ProductoDTO productoDTO);
         ProductoDTO ObtenerProducto(int idProducto);
         ICollection<ProductoDTO> ObtenerProductos();
     }

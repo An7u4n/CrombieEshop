@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Model.Entity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model.DTO
 {
@@ -8,5 +9,15 @@ namespace Model.DTO
         public string NombreProducto { get; set; }
         public string Descripcion { get; set; }
         public double Precio { get; set; }
+
+        public ProductoDTO() { }
+
+        public ProductoDTO(Producto producto)
+        {
+            Id = producto.Id;
+            NombreProducto = producto.NombreProducto;
+            Descripcion = producto.Descripcion;
+            Precio = producto.Precio;
+        }
     }
 }
