@@ -1,6 +1,7 @@
 ﻿using Data.Repository.Interfaces;
 using Model.DTO;
 using Model.Entity;
+using Service.Interfaces;
 using Service.Utility;
 
 namespace Service

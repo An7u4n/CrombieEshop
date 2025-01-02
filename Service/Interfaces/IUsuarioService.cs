@@ -1,6 +1,6 @@
 ﻿using Model.DTO;
 
-namespace Service
+namespace Service.Interfaces
 {
     public interface IUsuarioService
     {
