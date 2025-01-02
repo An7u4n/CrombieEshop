@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
+using Model.Entity;
 using Service.Interfaces;
 
 namespace Web.Api.Controllers
@@ -23,19 +24,19 @@ namespace Web.Api.Controllers
                 var productos = _productoService.ObtenerProductos();
                 return Ok(productos);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
-            
+
         }
 
-        [HttpGet("{idProducto}")]
-        public ActionResult<ProductoDTO> ObtenerProducto(int idProducto)
+        [HttpGet("{id}")]
+        public ActionResult<ProductoDTO> ObtenerProducto(int id)
         {
             try
             {
-                var producto = _productoService.ObtenerProducto(idProducto);
+                var producto = _productoService.ObtenerProducto(id);
                 return Ok(producto);
             }
             catch (Exception ex)
@@ -45,12 +46,12 @@ namespace Web.Api.Controllers
         }
 
         [HttpPost]
-        public ActionResult GuardarProducto(ProductoDTO productoDTO)
+        public ActionResult CrearProducto(ProductoDTO productoDTO)
         {
             try
             {
-                _productoService.GuardarProducto(productoDTO);
-                return Created();
+                var productoCreado = _productoService.CrearProducto(productoDTO);
+                return Created("", productoCreado);
             }
             catch (Exception ex)
             {
@@ -58,13 +59,17 @@ namespace Web.Api.Controllers
             }
         }
 
-        [HttpPut]
-        public ActionResult ActualizarProducto(ProductoDTO productoDTO)
+        [HttpPut("{id}")]
+        public ActionResult ActualizarProducto(int id,ProductoDTO productoDTO)
         {
             try
             {
+                if (id != productoDTO.Id)
+                {
+                    return BadRequest("User ID mismatch.");
+                }
                 _productoService.ActualizarProducto(productoDTO);
-                return Ok("Producto actualizado correctamente");
+                return Ok(productoDTO);
             }
             catch (Exception ex)
             {
@@ -72,12 +77,12 @@ namespace Web.Api.Controllers
             }
         }
 
-        [HttpDelete("{idProducto}")]
-        public ActionResult EliminarProducto(int idProducto)
+        [HttpDelete("{id}")]
+        public ActionResult EliminarProducto(int id)
         {
             try
             {
-                _productoService.EliminarProducto(idProducto);
+                _productoService.EliminarProducto(id);
                 return Ok("Producto eliminado correctamente");
             }
             catch (Exception ex)

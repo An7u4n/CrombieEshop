@@ -16,10 +16,11 @@ namespace Data.Repository
             return _context.Usuarios.FirstOrDefault(u => u.Id == idUsuario);
         }
 
-        public void GuardarUsuario(Usuario usuario)
+        public Usuario CrearUsuario(Usuario usuario)
         {
             _context.Usuarios.Add(usuario);
             _context.SaveChanges();
+            return usuario;
         }
 
         public void ActualizarUsuario(Usuario usuario)

@@ -9,6 +9,6 @@ namespace Model.Entity
         public string Nombre { get; set; }
         public string Contrasena { get; set; }
         [EmailAddress] public string Email { get; set; }
-        public virtual WishList WishList { get; set; } = new WishList();
+        public virtual List<WishListItem> WishListItems { get; set; } = [];
     }
 }

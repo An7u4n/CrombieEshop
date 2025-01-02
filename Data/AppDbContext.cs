@@ -11,7 +11,7 @@ namespace Data
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Producto> Productos { get; set; }
-        public DbSet<WishList> WishLists { get; set; }
+        public DbSet<WishListItem> WishListsItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,7 +23,6 @@ namespace Data
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
                 usuario.Property(u => u.Contrasena).HasMaxLength(256).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
-                usuario.HasOne(u => u.WishList).WithOne(w => w.Usuario).HasForeignKey<WishList>(w => w.UsuarioId);
             });
 
             modelBuilder.Entity<Producto>(producto =>
@@ -34,15 +33,12 @@ namespace Data
                 producto.Property(p => p.Descripcion).HasMaxLength(512).IsRequired();
                 producto.Property(p => p.Precio).IsRequired();
             });
-
-            modelBuilder.Entity<WishList>(wishList =>
-            {
-                wishList.ToTable("WishLists");
-                wishList.HasKey(w => w.Id);
-                wishList
-                    .HasMany(w => w.Productos)
-                    .WithMany()
-                    .UsingEntity(j => j.ToTable("WishListProducto"));
+            modelBuilder.Entity<WishListItem>(wishListItems => {
+                wishListItems.ToTable("WishListItems");
+                wishListItems.HasKey(wli => new { wli.UsuarioId, wli.ProductoId });
+                wishListItems.HasOne(wli => wli.Usuario).WithMany(u => u.WishListItems).HasForeignKey(wli => wli.UsuarioId);
+                wishListItems.HasOne(wli => wli.Producto).WithOne().HasForeignKey<WishListItem>(wli => wli.ProductoId);
+                wishListItems.Property(wli => wli.CreatedAt).HasDefaultValueSql("GETDATE()");
             });
         }
     }
