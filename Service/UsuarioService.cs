@@ -17,7 +17,7 @@ namespace Service
             _wishListItemsRepository = wishListItemsRepository;
         }
 
-        public void CrearUsuario(UsuarioDTO usuarioDTO)
+        public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
         {
             if (usuarioDTO.NombreDeUsuario == null || usuarioDTO.NombreDeUsuario == string.Empty)
                 throw new ArgumentNullException("El nombre de usuario es requerido.");
@@ -36,7 +36,8 @@ namespace Service
                 Email = usuarioDTO.Email
             };
 
-            _usuarioRepository.GuardarUsuario(usuario);
+            var usuarioNuevo = _usuarioRepository.CrearUsuario(usuario);
+            return new UsuarioDTO(usuarioNuevo);
         }
 
         public void ActualizarUsuario(UsuarioDTO usuarioDTO)

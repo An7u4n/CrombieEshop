@@ -7,6 +7,6 @@ namespace Data.Repository.Interfaces
         void ActualizarUsuario(Usuario usuario);
         void EliminarUsuario(int idUsuario);
         Usuario ObtenerUsuario(int idUsuario);
-        void GuardarUsuario(Usuario usuario);
+        Usuario CrearUsuario(Usuario usuario);
     }
 }

@@ -20,8 +20,8 @@ namespace Web.Api.Controllers
         {
             try
             {
-                _usuarioService.CrearUsuario(usuario);
-                return Created();
+                var usuarioCreado = _usuarioService.CrearUsuario(usuario);
+                return Created("", usuarioCreado);
             }
             catch (Exception ex)
             {
@@ -29,11 +29,16 @@ namespace Web.Api.Controllers
             }
         }
 
-        [HttpPut]
-        public ActionResult ActualizarUsuario(UsuarioDTO usuario)
+        [HttpPut("{id}")]
+        public ActionResult ActualizarUsuario(int id, UsuarioDTO usuario)
         {
             try
             {
+                if (id != usuario.Id)
+                {
+                    return BadRequest("User ID mismatch.");
+                }
+
                 _usuarioService.ActualizarUsuario(usuario);
                 return Ok();
             }
