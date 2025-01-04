@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
-using Service;
+using Service.Interfaces;
 
 namespace Web.Api.Controllers
 {
@@ -20,8 +20,8 @@ namespace Web.Api.Controllers
         {
             try
             {
-                _usuarioService.CrearUsuario(usuario);
-                return Created();
+                var usuarioCreado = _usuarioService.CrearUsuario(usuario);
+                return Created("", usuarioCreado);
             }
             catch (Exception ex)
             {
@@ -29,17 +29,61 @@ namespace Web.Api.Controllers
             }
         }
 
-        [HttpPut]
-        public ActionResult ActualizarUsuario(UsuarioDTO usuario)
+        [HttpPut("{id}")]
+        public ActionResult ActualizarUsuario(int id, UsuarioDTO usuario)
         {
             try
             {
+                if (id != usuario.Id)
+                {
+                    return BadRequest("User ID mismatch.");
+                }
+
                 _usuarioService.ActualizarUsuario(usuario);
                 return Ok();
             }
             catch (ArgumentNullException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpGet("{id}/wishlist")]
+        public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
+        {
+            try
+            {
+                var productos = _usuarioService.ListarItemsWishList(id);
+                return Ok(productos);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpPost("{id}/wishlist/{idProducto}")]
+        public ActionResult AgregarItemAWishList(int id,int idProducto)
+        {
+            try
+            {
+                _usuarioService.AgregarItemsWishList(id, idProducto);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpDelete("{id}/wishlist/{idProducto}")]
+        public ActionResult EliminarItemWishList(int id, int idProducto)
+        {
+            try
+            {
+                _usuarioService.EliminarItemsWishList(id, idProducto);
+                return Ok();
             }
             catch (Exception ex)
             {

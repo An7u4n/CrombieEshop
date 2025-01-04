@@ -6,7 +6,7 @@ namespace Data.Repository.Interfaces
     {
         void ActualizarProducto(Producto producto);
         void EliminarProducto(int idProducto);
-        void GuardarProducto(Producto producto);
+        Producto CrearProducto(Producto producto);
         Producto ObtenerProducto(int idProducto);
         ICollection<Producto> ObtenerProductos();
     }

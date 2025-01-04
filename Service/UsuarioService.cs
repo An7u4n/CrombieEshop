@@ -1,6 +1,7 @@
 ﻿using Data.Repository.Interfaces;
 using Model.DTO;
 using Model.Entity;
+using Service.Interfaces;
 using Service.Utility;
 
 namespace Service
@@ -8,13 +9,15 @@ namespace Service
     public class UsuarioService : IUsuarioService
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IWishListItemsRepository _wishListItemsRepository;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository)
         {
             _usuarioRepository = usuarioRepository;
+            _wishListItemsRepository = wishListItemsRepository;
         }
 
-        public void CrearUsuario(UsuarioDTO usuarioDTO)
+        public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
         {
             if (usuarioDTO.NombreDeUsuario == null || usuarioDTO.NombreDeUsuario == string.Empty)
                 throw new ArgumentNullException("El nombre de usuario es requerido.");
@@ -33,7 +36,8 @@ namespace Service
                 Email = usuarioDTO.Email
             };
 
-            _usuarioRepository.GuardarUsuario(usuario);
+            var usuarioNuevo = _usuarioRepository.CrearUsuario(usuario);
+            return new UsuarioDTO(usuarioNuevo);
         }
 
         public void ActualizarUsuario(UsuarioDTO usuarioDTO)
@@ -60,6 +64,24 @@ namespace Service
             usuario.Email = usuarioDTO.Email;
 
             _usuarioRepository.ActualizarUsuario(usuario);
+        }
+
+        void IUsuarioService.AgregarItemsWishList(int idUsuario, int idProducto)
+        {
+            _wishListItemsRepository.AgregarProductoWishList(idUsuario, idProducto);
+
+        }
+
+        void IUsuarioService.EliminarItemsWishList(int idUsuario, int idProducto)
+        {
+            _wishListItemsRepository.EliminarProductoWishList(idUsuario, idProducto);
+        }
+
+        ICollection<ProductoDTO> IUsuarioService.ListarItemsWishList(int idUsuario)
+        {
+            var productos = _wishListItemsRepository.ObtenerProductosWishList(idUsuario);
+            var productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
+            return productosDTO;
         }
     }
 }
