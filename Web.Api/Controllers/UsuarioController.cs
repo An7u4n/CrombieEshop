@@ -14,6 +14,19 @@ namespace Web.Api.Controllers
         {
             _usuarioService = usuarioService;
         }
+        [HttpGet]
+        public ActionResult<ICollection<UsuarioDTO>> ObtenerUsuarios()
+        {
+            try
+            {
+                var usuarios = _usuarioService.ObtenerUsuarios();
+                return Ok(usuarios);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
 
         [HttpPost]
         public ActionResult CrearUsuario(UsuarioDTO usuario)
@@ -51,6 +64,33 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpGet("{id}")]
+        public ActionResult<UsuarioDTO> ObtenerUsuario(int id)
+        {
+            try
+            {
+                var usuario = _usuarioService.ObtenerUsuario(id);
+                return Ok(usuario);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpDelete("{id}")]
+        public ActionResult EliminarUsuario(int id)
+        {
+            try
+            {
+                _usuarioService.EliminarUsuario(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
         [HttpGet("{id}/wishlist")]
         public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
         {

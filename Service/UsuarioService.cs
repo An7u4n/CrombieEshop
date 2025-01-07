@@ -83,5 +83,27 @@ namespace Service
             var productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
             return productosDTO;
         }
+
+        public void EliminarUsuario(int idUsuario)
+        {
+            _usuarioRepository.EliminarUsuario(idUsuario);
+        }
+
+        public UsuarioDTO ObtenerUsuario(int idUsuario)
+        {
+            var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
+            if (usuario == null)
+                throw new Exception("Usuario no encontrado.");
+            return new UsuarioDTO(usuario);
+        }
+
+        public ICollection<UsuarioDTO> ObtenerUsuarios()
+        {
+            var usuarios = _usuarioRepository.ObtenerUsuarios();
+            if (usuarios == null)
+                throw new Exception("No se han encontrado usuarios.");
+            var usuariosDTO = usuarios.Select(u => new UsuarioDTO(u)).ToList();
+            return usuariosDTO;
+        }
     }
 }

@@ -35,5 +35,11 @@ namespace Data.Repository
             _context.Usuarios.Remove(usuario);
             _context.SaveChanges();
         }
+
+        ICollection<Usuario> IUsuarioRepository.ObtenerUsuarios()
+        {
+            var usuarios = _context.Usuarios.ToList();
+            return usuarios;
+        }
     }
 }
