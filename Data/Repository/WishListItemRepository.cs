@@ -28,6 +28,11 @@ namespace Data.Repository
             {
                 throw new ArgumentException("Usuario or Producto not found.");
             }
+            var existingWishListItem = _context.WishListsItems.FirstOrDefault(w => w.Usuario.Id == idUsuario && w.Producto.Id == idProducto);
+            if(existingWishListItem != null)
+            {
+                return;
+            }
             var wishListItem = new WishListItem
             {
                 Usuario = usuario,
