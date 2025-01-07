@@ -41,5 +41,17 @@ namespace Data.Repository
             var usuarios = _context.Usuarios.ToList();
             return usuarios;
         }
+
+        public Usuario EncontrarPorEmail(string email)
+        {
+            var user = _context.Usuarios.FirstOrDefault(u => u.Email == email);
+            return user;
+        }
+
+        public Usuario EncontrarPorNombreUsuario(string nombreUsuario)
+        {
+            var user = _context.Usuarios.FirstOrDefault(u => u.NombreDeUsuario == nombreUsuario);
+            return user;
+        }
     }
 }

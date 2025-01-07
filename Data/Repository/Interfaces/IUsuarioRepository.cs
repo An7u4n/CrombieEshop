@@ -8,6 +8,10 @@ namespace Data.Repository.Interfaces
         void EliminarUsuario(int idUsuario);
         Usuario ObtenerUsuario(int idUsuario);
         Usuario CrearUsuario(Usuario usuario);
+
+        Usuario EncontrarPorEmail(string email);
+
+        Usuario EncontrarPorNombreUsuario(string nombreUsuario);
         ICollection<Usuario> ObtenerUsuarios();
     }
 }
