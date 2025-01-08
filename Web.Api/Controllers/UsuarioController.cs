@@ -6,7 +6,6 @@ using Service.Interfaces;
 
 namespace Web.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
@@ -16,6 +15,7 @@ namespace Web.Api.Controllers
         {
             _usuarioService = usuarioService;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<ICollection<UsuarioDTO>> ObtenerUsuarios()
         {
@@ -29,7 +29,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult CrearUsuario(UsuarioDTO usuario)
         {
@@ -43,7 +43,7 @@ namespace Web.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public ActionResult ActualizarUsuario(int id, UsuarioDTO usuario)
         {
@@ -66,6 +66,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public ActionResult<UsuarioDTO> ObtenerUsuario(int id)
         {
@@ -79,6 +80,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public ActionResult EliminarUsuario(int id)
         {
@@ -92,7 +94,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize]
         [HttpGet("{id}/wishlist")]
         public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
         {
@@ -106,6 +108,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [Authorize]
         [HttpPost("{id}/wishlist/{idProducto}")]
         public ActionResult AgregarItemAWishList(int id,int idProducto)
         {
@@ -119,6 +122,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [Authorize]
         [HttpDelete("{id}/wishlist/{idProducto}")]
         public ActionResult EliminarItemWishList(int id, int idProducto)
         {

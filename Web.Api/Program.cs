@@ -65,7 +65,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SECRET"])),
         ValidIssuer = builder.Configuration["JWT:ISSUER"],
         ValidAudience = builder.Configuration["JWT:AUDIENCE"],
-        RoleClaimType = "Role",
+        RoleClaimType = "Roles",
         ClockSkew = TimeSpan.Zero
     };
 }
@@ -91,9 +91,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
 });
 var app = builder.Build();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
