@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Model.Entity;
 using Model.Enums;
 
@@ -24,7 +26,7 @@ namespace Data
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
                 usuario.Property(u => u.Contrasena).HasMaxLength(256).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
-                usuario.Property(u => u.Role).HasDefaultValue(Role.User);
+                usuario.Property(u => u.Role).IsRequired().HasDefaultValue(Role.User);
             });
 
             modelBuilder.Entity<Producto>(producto =>

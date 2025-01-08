@@ -10,7 +10,7 @@ namespace Model.Entity
         public string NombreDeUsuario { get; set; }
         public string Nombre { get; set; }
         public string Contrasena { get; set; }
-        public Role Role { get; set; } = Role.User;
+        public Role? Role { get; set; } = null;
         [EmailAddress] public string Email { get; set; }
         public virtual List<WishListItem> WishListItems { get; set; } = [];
 

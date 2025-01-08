@@ -19,7 +19,7 @@ namespace Model.DTO
             NombreDeUsuario = usuario.NombreDeUsuario;
             Nombre = usuario.Nombre;
             Contrasena = usuario.Contrasena;
-            Role = usuario.Role;
+            Role = (Role)usuario.Role;
             Email = usuario.Email;
         }
     }
