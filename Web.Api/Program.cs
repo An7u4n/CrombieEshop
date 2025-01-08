@@ -1,7 +1,11 @@
+using System.Text;
 using Data;
 using Data.Repository;
 using Data.Repository.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Service;
 using Service.Interfaces;
 
@@ -19,6 +23,22 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IWishListItemsRepository, WishListItemRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<ITokenService,TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+{
+    o.RequireHttpsMetadata = false;
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SECRET"])),
+        ValidIssuer = builder.Configuration["JWT:ISSUER"],
+        ValidAudience = builder.Configuration["JWT:AUDIENCE"],
+        RoleClaimType = "Role",
+        ClockSkew = TimeSpan.Zero
+    };
+}
+);
 
 var app = builder.Build();
 
@@ -27,7 +47,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     context.Database.Migrate();
 }
-
+app.UseAuthorization();
+app.UseAuthentication();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
