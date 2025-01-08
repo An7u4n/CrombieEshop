@@ -35,7 +35,7 @@ namespace Web.Api.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpPost]
+        [HttpPost("login")]
         public ActionResult Login(AuthDTO authData)
         {
             //Should create a token and return it
