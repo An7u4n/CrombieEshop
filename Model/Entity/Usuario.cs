@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using Model.DTO;
 using Model.Enums;
 
@@ -18,10 +19,11 @@ namespace Model.Entity
 
         public Usuario(UsuarioDTO dto)
         {
+            var hasher = new PasswordHasher<Usuario>();
             Id = dto.Id;
             NombreDeUsuario = dto.NombreDeUsuario;
             Nombre = dto.Nombre;
-            Contrasena = dto.Contrasena;
+            Contrasena = hasher.HashPassword(null, dto.Contrasena);
             Role = dto.Role;
             Email = dto.Email;
         }

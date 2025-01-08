@@ -30,14 +30,7 @@ namespace Service
             if (usuarioDTO.Email == null || usuarioDTO.Email == string.Empty)
                 throw new ArgumentNullException("El email es requerido.");
 
-            var usuario = new Usuario
-            {
-                NombreDeUsuario = usuarioDTO.NombreDeUsuario,
-                Nombre = usuarioDTO.Nombre,
-                Contrasena = "",
-                Email = usuarioDTO.Email
-            };
-            usuario.Contrasena = _passwordHasher.HashPassword(usuario, usuarioDTO.Contrasena);
+            var usuario = new Usuario(usuarioDTO);
 
             var usuarioNuevo = _usuarioRepository.CrearUsuario(usuario);
             return new UsuarioDTO(usuarioNuevo);
