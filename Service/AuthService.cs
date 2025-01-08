@@ -12,7 +12,7 @@ using Service.Interfaces;
 
 namespace Service
 {
-    internal class AuthService : IAuthService
+    public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _userRepository;
         private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
