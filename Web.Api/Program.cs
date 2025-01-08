@@ -39,14 +39,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 }
 );
-
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
-}
+    // SQL Server
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
+
+    // Enable sensitive data logging only in Development
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+});
+var app = builder.Build();
 app.UseAuthorization();
 app.UseAuthentication();
 // Configure the HTTP request pipeline.
