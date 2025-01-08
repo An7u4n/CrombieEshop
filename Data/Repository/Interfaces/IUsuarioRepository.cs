@@ -9,9 +9,9 @@ namespace Data.Repository.Interfaces
         Usuario ObtenerUsuario(int idUsuario);
         Usuario CrearUsuario(Usuario usuario);
 
-        Usuario EncontrarPorEmail(string email);
+        Usuario FindByEmail(string email);
 
-        Usuario EncontrarPorNombreUsuario(string nombreUsuario);
+        Usuario FindByNombreUsuario(string nombreUsuario);
         ICollection<Usuario> ObtenerUsuarios();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Model.Entity;
+using Model.Enums;
 
 namespace Data
 {
@@ -23,6 +24,7 @@ namespace Data
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
                 usuario.Property(u => u.Contrasena).HasMaxLength(256).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
+                usuario.Property(u => u.Role).HasDefaultValue(Role.User);
             });
 
             modelBuilder.Entity<Producto>(producto =>

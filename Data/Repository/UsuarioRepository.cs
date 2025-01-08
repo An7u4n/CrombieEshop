@@ -42,13 +42,13 @@ namespace Data.Repository
             return usuarios;
         }
 
-        public Usuario EncontrarPorEmail(string email)
+        public Usuario FindByEmail(string email)
         {
             var user = _context.Usuarios.FirstOrDefault(u => u.Email == email);
             return user;
         }
 
-        public Usuario EncontrarPorNombreUsuario(string nombreUsuario)
+        public Usuario FindByNombreUsuario(string nombreUsuario)
         {
             var user = _context.Usuarios.FirstOrDefault(u => u.NombreDeUsuario == nombreUsuario);
             return user;
