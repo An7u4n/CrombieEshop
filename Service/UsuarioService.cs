@@ -1,8 +1,9 @@
 ﻿using Data.Repository.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Model.DTO;
 using Model.Entity;
 using Service.Interfaces;
-using Service.Utility;
+
 
 namespace Service
 {
@@ -10,6 +11,7 @@ namespace Service
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IWishListItemsRepository _wishListItemsRepository;
+        private readonly PasswordHasher<Usuario> _passwordHasher;
 
         public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository)
         {
@@ -28,13 +30,7 @@ namespace Service
             if (usuarioDTO.Email == null || usuarioDTO.Email == string.Empty)
                 throw new ArgumentNullException("El email es requerido.");
 
-            var usuario = new Usuario
-            {
-                NombreDeUsuario = usuarioDTO.NombreDeUsuario,
-                Nombre = usuarioDTO.Nombre,
-                Contrasena = PasswordHasher.HashPassword(usuarioDTO.Contrasena),
-                Email = usuarioDTO.Email
-            };
+            var usuario = new Usuario(usuarioDTO);
 
             var usuarioNuevo = _usuarioRepository.CrearUsuario(usuario);
             return new UsuarioDTO(usuarioNuevo);
@@ -60,8 +56,8 @@ namespace Service
 
             usuario.NombreDeUsuario = usuarioDTO.NombreDeUsuario;
             usuario.Nombre = usuarioDTO.Nombre;
-            usuario.Contrasena = PasswordHasher.HashPassword(usuarioDTO.Contrasena);
             usuario.Email = usuarioDTO.Email;
+            usuario.Contrasena = _passwordHasher.HashPassword(usuario, usuarioDTO.Contrasena);
 
             _usuarioRepository.ActualizarUsuario(usuario);
         }

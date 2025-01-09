@@ -1,4 +1,6 @@
-﻿using Model.Entity;
+﻿using System.Text.Json.Serialization;
+using Model.Entity;
+using Model.Enums;
 
 namespace Model.DTO
 {
@@ -9,7 +11,8 @@ namespace Model.DTO
         public string Nombre { get; set; }
         public string Contrasena { get; set; }
         public string Email { get; set; }
-
+        [JsonIgnore]
+        public Role Role { get; set; } = Role.User;
         public UsuarioDTO() { }
 
         public UsuarioDTO(Usuario usuario)
@@ -18,6 +21,7 @@ namespace Model.DTO
             NombreDeUsuario = usuario.NombreDeUsuario;
             Nombre = usuario.Nombre;
             Contrasena = usuario.Contrasena;
+            Role = (Role)usuario.Role;
             Email = usuario.Email;
         }
     }

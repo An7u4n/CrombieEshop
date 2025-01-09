@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Model.Entity;
+using Model.Enums;
 
 namespace Data
 {
@@ -20,9 +23,24 @@ namespace Data
                 usuario.ToTable("Usuarios");
                 usuario.HasKey(u => u.Id);
                 usuario.Property(u => u.NombreDeUsuario).HasMaxLength(80).IsRequired();
+                usuario.HasIndex(u => u.NombreDeUsuario).IsUnique();
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
                 usuario.Property(u => u.Contrasena).HasMaxLength(256).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
+                usuario.HasIndex(u => u.Email).IsUnique();
+                usuario.Property(u => u.Role).IsRequired().HasDefaultValue(Role.User);
+                //var hasher = new PasswordHasher<Usuario>();
+                //var adminUser = new Usuario
+                //{
+                //    Id = 1,
+                //    NombreDeUsuario = "admin",
+                //    Nombre = "Administrador",
+                //    Email = "admin@admin.com",
+                //    Role = Role.Admin,
+                //    Contrasena = hasher.HashPassword(null, "admin") // Note: passing null as first parameter
+                //};
+
+                //usuario.HasData(adminUser);
             });
 
             modelBuilder.Entity<Producto>(producto =>

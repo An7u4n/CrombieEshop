@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model.Entity;
@@ -16,6 +17,7 @@ namespace Web.Api.Controllers
             _productoService = productoService;
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult<ICollection<ProductoDTO>> ObtenerProductos()
         {
@@ -30,7 +32,7 @@ namespace Web.Api.Controllers
             }
 
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<ProductoDTO> ObtenerProducto(int id)
         {
@@ -44,7 +46,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult CrearProducto(ProductoDTO productoDTO)
         {
@@ -58,9 +60,9 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public ActionResult ActualizarProducto(int id,ProductoDTO productoDTO)
+        public ActionResult ActualizarProducto(int id, ProductoDTO productoDTO)
         {
             try
             {
@@ -76,7 +78,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public ActionResult EliminarProducto(int id)
         {
