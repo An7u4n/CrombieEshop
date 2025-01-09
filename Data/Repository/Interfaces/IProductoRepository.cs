@@ -1,4 +1,5 @@
-﻿using Model.Entity;
+﻿using Model.DTO;
+using Model.Entity;
 
 namespace Data.Repository.Interfaces
 {
@@ -9,5 +10,6 @@ namespace Data.Repository.Interfaces
         Producto CrearProducto(Producto producto);
         Producto ObtenerProducto(int idProducto);
         ICollection<Producto> ObtenerProductos();
+        ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros);
     }
 }

@@ -75,5 +75,10 @@ namespace Service
 
             _productoRepository.EliminarProducto(producto.Id);
         }
+
+        public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
+        {
+            return _productoRepository.BuscarProductos(parametros);
+        }
     }
 }

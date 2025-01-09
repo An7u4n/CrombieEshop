@@ -33,6 +33,20 @@ namespace Web.Api.Controllers
 
         }
         [Authorize]
+        [HttpGet("search")]
+        public ActionResult<ProductoBusquedaDTO> BuscarProductos([FromQuery] ProductoParametrosBusquedaDTO parametros)
+        {
+            try
+            {
+                var productos = _productoService.BuscarProductos(parametros);
+                return Ok(productos);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
         [HttpGet("{id}")]
         public ActionResult<ProductoDTO> ObtenerProducto(int id)
         {
