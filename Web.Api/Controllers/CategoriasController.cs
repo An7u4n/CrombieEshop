@@ -54,12 +54,12 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpGet("{id}/productos")]
-        public ActionResult<CategoriaDTO> ObtenerCategoriaConProductos(int id)
+        public ActionResult<ICollection<ProductoDTO>> ObtenerProductosDeCategoria(int id)
         {
             try
             {
-                var categoria = _categoriaService.ObtenerCategoriaConProductos(id);
-                return Ok(categoria);
+                var productos = _categoriaService.ObtenerProductosDeCategoria(id);
+                return Ok(productos);
             }
             catch (Exception ex)
             {

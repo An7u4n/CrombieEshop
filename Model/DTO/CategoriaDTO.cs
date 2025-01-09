@@ -11,15 +11,12 @@ namespace Model.DTO
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-        public List<ProductoDTO>? Productos { get; set; } = new List<ProductoDTO>();
-
         public CategoriaDTO() { }
 
         public CategoriaDTO(Categoria categoria)
         {
             Id = categoria.Id;
             Nombre = categoria.Nombre;
-            Productos = categoria.Productos.Select(p => new ProductoDTO(p)).ToList();
         }
     }
 }

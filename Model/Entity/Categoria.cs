@@ -17,7 +17,6 @@ namespace Model.Entity
         {
             Id = dto.Id;
             Nombre = dto.Nombre;
-            Productos = dto.Productos.Select(p => new Producto(p)).ToList();
         }
     }
 }

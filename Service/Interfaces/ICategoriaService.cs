@@ -13,7 +13,7 @@ namespace Service.Interfaces
         void EliminarCategoria(int idCategoria);
         CategoriaDTO CrearCategoria(CategoriaDTO productoDTO);
         CategoriaDTO ObtenerCategoria(int idCategoria);
-        CategoriaDTO ObtenerCategoriaConProductos(int idCategoria);
+        ICollection<ProductoDTO> ObtenerProductosDeCategoria(int idCategoria);
         ICollection<CategoriaDTO> ObtenerCategorias();
     }
 }

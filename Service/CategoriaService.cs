@@ -42,10 +42,10 @@ namespace Service
             return new CategoriaDTO(categoria);
         }
 
-        public CategoriaDTO ObtenerCategoriaConProductos(int idCategoria)
+        public ICollection<ProductoDTO> ObtenerProductosDeCategoria(int idCategoria)
         {
             var categoria = _categoriaRepository.ObtenerCategoriaConProductos(idCategoria);
-            return new CategoriaDTO(categoria);
+            return categoria.Productos.Select(p => new ProductoDTO(p)).ToList();
         }
 
         public ICollection<CategoriaDTO> ObtenerCategorias()
