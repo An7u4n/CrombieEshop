@@ -15,6 +15,7 @@ namespace Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<WishListItem> WishListsItems { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,8 +51,17 @@ namespace Data
                 producto.Property(p => p.NombreProducto).HasMaxLength(80).IsRequired();
                 producto.Property(p => p.Descripcion).HasMaxLength(512).IsRequired();
                 producto.Property(p => p.Precio).IsRequired();
+                producto.HasMany(p => p.Categorias).WithMany(c => c.Productos);
             });
-            modelBuilder.Entity<WishListItem>(wishListItems => {
+            modelBuilder.Entity<Categoria>(c =>
+            {
+                c.ToTable("Categorias");
+                c.HasKey(c => c.Id);
+                c.Property(c => c.Nombre).HasMaxLength(80).IsRequired();
+                c.HasIndex(c => c.Nombre).IsUnique();
+            });
+            modelBuilder.Entity<WishListItem>(wishListItems =>
+            {
                 wishListItems.ToTable("WishListItems");
                 wishListItems.HasKey(wli => new { wli.UsuarioId, wli.ProductoId });
                 wishListItems.HasOne(wli => wli.Usuario).WithMany(u => u.WishListItems).HasForeignKey(wli => wli.UsuarioId);

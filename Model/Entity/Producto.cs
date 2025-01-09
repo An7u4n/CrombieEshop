@@ -9,6 +9,7 @@ namespace Model.Entity
         public string NombreProducto { get; set; }
         public string Descripcion { get; set; }
         public double Precio { get; set; }
+        public virtual List<Categoria> Categorias { get; set; } = [];
 
         public Producto() { }
 
