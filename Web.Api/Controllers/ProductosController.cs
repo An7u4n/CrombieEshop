@@ -61,6 +61,20 @@ namespace Web.Api.Controllers
             }
         }
         [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/categoria/{idCategoria}")]
+        public ActionResult<ProductoDTO> AddCategoria(int id, int idCategoria)
+        {
+            try
+            {
+                var producto = _productoService.AddCategoria(id, idCategoria);
+                return Ok(producto);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult CrearProducto(ProductoDTO productoDTO)
         {

@@ -8,6 +8,8 @@ namespace Service.Interfaces
         void EliminarProducto(int idProducto);
         ProductoDTO CrearProducto(ProductoDTO productoDTO);
         ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros);
+
+        ProductoDTO AddCategoria(int idProducto, int idCategoria);
         ProductoDTO ObtenerProducto(int idProducto);
         ICollection<ProductoDTO> ObtenerProductos();
     }
