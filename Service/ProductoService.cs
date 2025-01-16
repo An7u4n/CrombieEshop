@@ -8,9 +8,11 @@ namespace Service
     public class ProductoService : IProductoService
     {
         private readonly IProductoRepository _productoRepository;
-        public ProductoService(IProductoRepository productoRepository)
+        private readonly ICategoriaRepository _categoriaRepository;
+        public ProductoService(IProductoRepository productoRepository, ICategoriaRepository categoriaRepository)
         {
             _productoRepository = productoRepository;
+            _categoriaRepository = categoriaRepository;
         }
 
         public ICollection<ProductoDTO> ObtenerProductos()
@@ -74,6 +76,28 @@ namespace Service
             }
 
             _productoRepository.EliminarProducto(producto.Id);
+        }
+
+        public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
+        {
+            return _productoRepository.BuscarProductos(parametros);
+        }
+
+        public ProductoDTO AddCategoria(int idProducto, int idCategoria)
+        {
+            var producto = _productoRepository.ObtenerProducto(idProducto);
+            var categoria = _categoriaRepository.ObtenerCategoria(idCategoria);
+            if (producto == null)
+            {
+                throw new Exception("Producto no encontrado");
+            }
+            if (categoria == null)
+            {
+                throw new Exception("Categoria no encontrada");
+            }
+            producto.Categorias.Add(categoria);
+            _productoRepository.ActualizarProducto(producto);
+            return new ProductoDTO(producto);
         }
     }
 }
