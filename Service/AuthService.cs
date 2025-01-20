@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Repository.Interfaces;
+﻿using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Model.DTO;
@@ -15,10 +10,12 @@ namespace Service
     public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _userRepository;
+        private readonly ICognitoAuthService _cognitoAuthService;
         private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
-        public AuthService(IUsuarioRepository usuarioRepository)
+        public AuthService(IUsuarioRepository usuarioRepository,ICognitoAuthService cognitoAuthService)
         {
             _userRepository = usuarioRepository;
+            _cognitoAuthService = cognitoAuthService;
         }
         // Should fetch user via email/username and password
         public UsuarioDTO LoginUsuario(AuthDTO userData)
@@ -42,11 +39,19 @@ namespace Service
             return new UsuarioDTO(user);
         }
 
-        public UsuarioDTO RegistrarUsuario(UsuarioDTO userData)
+        public async Task<UsuarioDTO> RegistrarUsuario(UsuarioDTO userData)
         {
-            Usuario user = new Usuario(userData);
-            _userRepository.CrearUsuario(user);
-            return new UsuarioDTO(user);
+            try
+            {
+                Usuario user = new Usuario(userData);
+                await _cognitoAuthService.RegistrarAsync(userData.Email, userData.Contrasena);
+                _userRepository.CrearUsuario(user);
+                return new UsuarioDTO(user);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

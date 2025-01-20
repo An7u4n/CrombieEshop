@@ -22,11 +22,11 @@ namespace Web.Api.Controllers
             _tokenService = tokenService;
         }
         [HttpPost("register")]
-        public ActionResult Register(UsuarioDTO dto)
+        public async Task<ActionResult> Register(UsuarioDTO dto)
         {
             try
             {
-                var user = _authService.RegistrarUsuario(dto);
+                var user = await _authService.RegistrarUsuario(dto);
                 var token = _tokenService.CreateJWTAuthToken(user);
                 return Ok(token);
             }
