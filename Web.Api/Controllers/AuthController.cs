@@ -13,14 +13,17 @@ namespace Web.Api.Controllers
     {
         private readonly IUsuarioService _usuarioService;
         private readonly IAuthService _authService;
+        private readonly ICognitoAuthService _cognitoAuthService;
         private readonly ITokenService _tokenService;
 
-        public AuthController(IUsuarioService userService, IAuthService authService, ITokenService tokenService)
+        public AuthController(IUsuarioService userService, IAuthService authService, ITokenService tokenService, ICognitoAuthService cognitoAuthService)
         {
             _usuarioService = userService;
             _authService = authService;
             _tokenService = tokenService;
+            _cognitoAuthService = cognitoAuthService;
         }
+
         [HttpPost("register")]
         public async Task<ActionResult> Register(UsuarioDTO dto)
         {
@@ -29,6 +32,19 @@ namespace Web.Api.Controllers
                 var user = await _authService.RegistrarUsuario(dto);
                 var token = _tokenService.CreateJWTAuthToken(user);
                 return Ok(token);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost("confirm-signup")]
+        public async Task<ActionResult> ConfirmSignUp(ConfirmSignUpDTO dto)
+        {
+            try
+            {
+                await _cognitoAuthService.ConfirmarRegistroAsync(dto.Email, dto.Code);
+                return Ok(dto.Email + " confirmado con exito");
             }
             catch (Exception e)
             {

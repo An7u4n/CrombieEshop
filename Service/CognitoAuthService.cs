@@ -57,6 +57,31 @@ namespace Service
             }
         }
 
+        public async Task ConfirmarRegistroAsync(string email, string code)
+        {
+            try
+            {
+                var signUpRequest = new ConfirmSignUpRequest
+                {
+                    ClientId = this._clientId,
+                    ConfirmationCode = code,
+                    Username = email,
+                    SecretHash = CalculateSecretHash(_clientId, _clientSecret, email)
+                };
+
+                var response = await _provider.ConfirmSignUpAsync(signUpRequest);
+                if (response.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception(email + " no pudo ser confirmado");
+                }
+                Console.WriteLine($"{email} fue confirmado");
+            }
+            catch(Exception ex) 
+            {
+                throw new Exception($"Error durante confirmación: {ex.Message}");
+            }
+        }
+
         public static string CalculateSecretHash(string clientId, string clientSecret, string username)
         {
             var message = username + clientId;

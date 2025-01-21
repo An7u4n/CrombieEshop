@@ -3,5 +3,6 @@
     public interface ICognitoAuthService
     {
         Task RegistrarAsync(string email, string password);
+        Task ConfirmarRegistroAsync(string userName, string code);
     }
 }
