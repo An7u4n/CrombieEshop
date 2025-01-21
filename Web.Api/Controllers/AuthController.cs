@@ -22,11 +22,11 @@ namespace Web.Api.Controllers
             _tokenService = tokenService;
         }
         [HttpPost("register")]
-        public ActionResult Register(UsuarioDTO dto)
+        async public Task<ActionResult> Register(UsuarioDTO dto)
         {
             try
             {
-                var user = _authService.RegistrarUsuario(dto);
+                var user = await _authService.RegistrarUsuario(dto);
                 var token = _tokenService.CreateJWTAuthToken(user);
                 return Ok(token);
             }
@@ -36,18 +36,35 @@ namespace Web.Api.Controllers
             }
         }
         [HttpPost("login")]
-        public ActionResult Login(AuthDTO authData)
+        async public Task<ActionResult> Login(AuthDTO authData)
         {
             //Should create a token and return it
             try
             {
-                var user = _authService.LoginUsuario(authData);
+                var user = await _authService.LoginUsuario(authData);
                 if (user == null)
                 {
                     return BadRequest("Invalid user or password");
                 }
                 var token = _tokenService.CreateJWTAuthToken(user);
                 return Ok(token);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost("confirm")]
+        async public Task<ActionResult> Confirm(string code, string username)
+        {
+            try
+            {
+                var could = await _authService.ConfirmarRegistro(code, username);
+                if (could)
+                {
+                    return Ok(could);
+                }
+                return BadRequest();
             }
             catch (Exception e)
             {
