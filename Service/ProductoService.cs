@@ -9,10 +9,12 @@ namespace Service
     {
         private readonly IProductoRepository _productoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
-        public ProductoService(IProductoRepository productoRepository, ICategoriaRepository categoriaRepository)
+        private readonly IS3Service _s3Service;
+        public ProductoService(IProductoRepository productoRepository, ICategoriaRepository categoriaRepository, IS3Service s3Service)
         {
             _productoRepository = productoRepository;
             _categoriaRepository = categoriaRepository;
+            _s3Service = s3Service;
         }
 
         public ICollection<ProductoDTO> ObtenerProductos()
@@ -98,6 +100,25 @@ namespace Service
             producto.Categorias.Add(categoria);
             _productoRepository.ActualizarProducto(producto);
             return new ProductoDTO(producto);
+        }
+
+        async public Task<ProductoDTO> SubirImagen(int idProducto, Stream stream, string fileName, string contentType)
+        {
+            var producto = _productoRepository.ObtenerProducto(idProducto);
+            if (producto == null)
+            {
+                throw new Exception("Producto no encontrado");
+            }
+            var key = GetS3Key(idProducto, fileName);
+            var url = await _s3Service.UploadFileAsync(stream, key, contentType);
+            var dto = new ProductoDTO(producto);
+            dto.ImagenUrl = url;
+            return dto;
+        }
+
+        private String GetS3Key(int idProducto, string fileName)
+        {
+            return $"productos/{idProducto}/{fileName}";
         }
     }
 }

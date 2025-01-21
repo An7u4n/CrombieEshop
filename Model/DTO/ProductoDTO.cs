@@ -10,6 +10,7 @@ namespace Model.DTO
         public string Descripcion { get; set; }
         public double Precio { get; set; }
 
+        public string? ImagenUrl { get; set; } = null;
         public List<CategoriaDTO>? Categorias { get; set; } = new List<CategoriaDTO>();
 
         public ProductoDTO() { }

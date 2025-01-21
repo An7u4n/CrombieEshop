@@ -12,9 +12,11 @@ namespace Web.Api.Controllers
     public class ProductosController : ControllerBase
     {
         private readonly IProductoService _productoService;
-        public ProductosController(IProductoService productoService)
+        private readonly IS3Service _s3Service;
+        public ProductosController(IProductoService productoService, IS3Service s3Service)
         {
             _productoService = productoService;
+            _s3Service = s3Service;
         }
 
         [Authorize]
@@ -120,5 +122,20 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/image")]
+        async public Task<ActionResult> SubirImagen(int id, IFormFile file)
+        {
+            try
+            {
+                var producto = await _productoService.SubirImagen(id, file.OpenReadStream(), file.FileName, file.ContentType);
+                return Ok(producto);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
+
 }

@@ -11,6 +11,7 @@ namespace Service.Interfaces
 
         ProductoDTO AddCategoria(int idProducto, int idCategoria);
         ProductoDTO ObtenerProducto(int idProducto);
+        Task<ProductoDTO> SubirImagen(int idProducto, Stream stream, string fileName,string contentType);
         ICollection<ProductoDTO> ObtenerProductos();
     }
 }

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.412.2" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.0" />
   </ItemGroup>
 
