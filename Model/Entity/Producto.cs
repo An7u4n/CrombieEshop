@@ -10,7 +10,7 @@ namespace Model.Entity
         public string Descripcion { get; set; }
         public double Precio { get; set; }
         public virtual List<Categoria> Categorias { get; set; } = [];
-
+        public string? ImagenUrl { get; set; } = null;
         public Producto() { }
 
         public Producto(ProductoDTO producto)
@@ -18,6 +18,7 @@ namespace Model.Entity
             NombreProducto = producto.NombreProducto;
             Descripcion = producto.Descripcion;
             Precio = producto.Precio;
+            ImagenUrl = producto.ImagenUrl;
         }
     }
 }

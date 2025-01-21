@@ -51,6 +51,7 @@ namespace Data
                 producto.Property(p => p.NombreProducto).HasMaxLength(80).IsRequired();
                 producto.Property(p => p.Descripcion).HasMaxLength(512).IsRequired();
                 producto.Property(p => p.Precio).IsRequired();
+                producto.Property(p => p.ImagenUrl).HasMaxLength(512);
                 producto.HasMany(p => p.Categorias).WithMany(c => c.Productos);
             });
             modelBuilder.Entity<Categoria>(c =>

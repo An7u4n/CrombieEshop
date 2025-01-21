@@ -111,8 +111,13 @@ namespace Service
             }
             var key = GetS3Key(idProducto, fileName);
             var url = await _s3Service.UploadFileAsync(stream, key, contentType);
+            if(producto.ImagenUrl != null)
+            {
+                await _s3Service.DeleteFileAsync(producto.ImagenUrl);
+            }
+            producto.ImagenUrl = url;
+            _productoRepository.ActualizarProducto(producto);
             var dto = new ProductoDTO(producto);
-            dto.ImagenUrl = url;
             return dto;
         }
 

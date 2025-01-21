@@ -22,6 +22,7 @@ namespace Model.DTO
             Descripcion = producto.Descripcion;
             Precio = producto.Precio;
             Categorias = producto.Categorias.Select(c => new CategoriaDTO(c)).ToList();
+            ImagenUrl = producto.ImagenUrl;
         }
     }
 }
