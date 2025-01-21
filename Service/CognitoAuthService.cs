@@ -4,9 +4,8 @@ using Amazon.Extensions.CognitoAuthentication;
 using Amazon.Runtime;
 using Microsoft.Extensions.Configuration;
 using Service.Interfaces;
+using Service.Utilities;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Service
 {
@@ -41,7 +40,7 @@ namespace Service
                     ClientId = _clientId,
                     Username = email,
                     Password = password,
-                    SecretHash = CalculateSecretHash(_clientId, _clientSecret, email)
+                    SecretHash = SecurityHelper.CalculateSecretHash(_clientId, _clientSecret, email)
                 };
 
                 var response = await _provider.SignUpAsync(request);
@@ -66,7 +65,7 @@ namespace Service
                     ClientId = this._clientId,
                     ConfirmationCode = code,
                     Username = email,
-                    SecretHash = CalculateSecretHash(_clientId, _clientSecret, email)
+                    SecretHash = SecurityHelper.CalculateSecretHash(_clientId, _clientSecret, email)
                 };
 
                 var response = await _provider.ConfirmSignUpAsync(signUpRequest);
@@ -79,18 +78,6 @@ namespace Service
             catch(Exception ex) 
             {
                 throw new Exception($"Error durante confirmación: {ex.Message}");
-            }
-        }
-
-        public static string CalculateSecretHash(string clientId, string clientSecret, string username)
-        {
-            var message = username + clientId;
-            var key = Encoding.UTF8.GetBytes(clientSecret);
-
-            using (var hmac = new HMACSHA256(key))
-            {
-                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
-                return Convert.ToBase64String(hash);
             }
         }
     }
