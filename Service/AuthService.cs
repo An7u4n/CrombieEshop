@@ -20,8 +20,14 @@ namespace Service
         {
             _userRepository = usuarioRepository;
         }
+
+        public Task<bool> ConfirmarRegistro(string code, string username)
+        {
+            throw new NotImplementedException();
+        }
+
         // Should fetch user via email/username and password
-        public UsuarioDTO LoginUsuario(AuthDTO userData)
+        async public Task<UsuarioDTO> LoginUsuario(AuthDTO userData)
         {
 
             Usuario user = null;
@@ -38,11 +44,10 @@ namespace Service
             {
                 throw new Exception("Invalid password");
             }
-
             return new UsuarioDTO(user);
         }
 
-        public UsuarioDTO RegistrarUsuario(UsuarioDTO userData)
+        async public Task<UsuarioDTO> RegistrarUsuario(UsuarioDTO userData)
         {
             Usuario user = new Usuario(userData);
             _userRepository.CrearUsuario(user);
