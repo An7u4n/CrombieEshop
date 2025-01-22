@@ -80,5 +80,35 @@ namespace Service
                 throw new Exception($"Error durante confirmación: {ex.Message}");
             }
         }
+
+        public async Task<string> IniciarSesion(string email, string password)
+        {
+            try
+            {
+                var authParameters = new Dictionary<string, string>();
+                authParameters.Add("USERNAME", email);
+                authParameters.Add("PASSWORD", password);
+                authParameters.Add("SECRET_HASH", SecurityHelper.CalculateSecretHash(_clientId, _clientSecret, email));
+
+                var authRequest = new InitiateAuthRequest
+                {
+                    ClientId = _clientId,
+                    AuthParameters = authParameters,
+                    AuthFlow = AuthFlowType.USER_PASSWORD_AUTH
+                };
+
+                var response = await _provider.InitiateAuthAsync(authRequest);
+                Console.WriteLine(response.AuthenticationResult);
+                if(response.HttpStatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception("Error al iniciar sesión");
+                }
+                return response.AuthenticationResult.AccessToken;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Error al iniciar sesión: {ex.Message}");
+            }
+        }
     }
 }

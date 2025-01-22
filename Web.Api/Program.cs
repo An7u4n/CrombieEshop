@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Service;
 using Service.Interfaces;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,25 +55,24 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IWishListItemsRepository, WishListItemRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICognitoAuthService, CognitoAuthService>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IS3Service, S3Service>();
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
-    o.RequireHttpsMetadata = false;
-    o.TokenValidationParameters = new TokenValidationParameters
+    options.Authority = builder.Configuration["AWS:Authority"];
+    options.Audience = builder.Configuration["AWS:Audience"];
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SECRET"])),
-        ValidIssuer = builder.Configuration["JWT:ISSUER"],
-        ValidAudience = builder.Configuration["JWT:AUDIENCE"],
-        RoleClaimType = "Roles",
-        ClockSkew = TimeSpan.Zero
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
     };
-}
-);
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     // SQL Server

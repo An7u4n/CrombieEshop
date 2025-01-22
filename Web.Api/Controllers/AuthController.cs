@@ -14,13 +14,11 @@ namespace Web.Api.Controllers
         private readonly IUsuarioService _usuarioService;
         private readonly IAuthService _authService;
         private readonly ICognitoAuthService _cognitoAuthService;
-        private readonly ITokenService _tokenService;
 
-        public AuthController(IUsuarioService userService, IAuthService authService, ITokenService tokenService, ICognitoAuthService cognitoAuthService)
+        public AuthController(IUsuarioService userService, IAuthService authService, ICognitoAuthService cognitoAuthService)
         {
             _usuarioService = userService;
             _authService = authService;
-            _tokenService = tokenService;
             _cognitoAuthService = cognitoAuthService;
         }
 
@@ -30,8 +28,7 @@ namespace Web.Api.Controllers
             try
             {
                 var user = await _authService.RegistrarUsuario(dto);
-                var token = _tokenService.CreateJWTAuthToken(user);
-                return Ok(token);
+                return Created(user.Id.ToString(), user);
             }
             catch (Exception e)
             {
@@ -52,18 +49,16 @@ namespace Web.Api.Controllers
             }
         }
         [HttpPost("login")]
-        public ActionResult Login(AuthDTO authData)
+        public async  Task<ActionResult<string>> Login(AuthDTO authData)
         {
-            //Should create a token and return it
             try
             {
-                var user = _authService.LoginUsuario(authData);
-                if (user == null)
+                if(authData.Email == null)
                 {
                     return BadRequest("Invalid user or password");
                 }
-                var token = _tokenService.CreateJWTAuthToken(user);
-                return Ok(token);
+                var result = await _cognitoAuthService.IniciarSesion(authData.Email, authData.Contrasena);
+                return Ok(result);
             }
             catch (Exception e)
             {

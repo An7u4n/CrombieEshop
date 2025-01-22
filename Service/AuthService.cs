@@ -1,9 +1,11 @@
 ﻿using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Model.DTO;
 using Model.Entity;
 using Service.Interfaces;
+using System.Net.WebSockets;
 
 namespace Service
 {
@@ -46,7 +48,9 @@ namespace Service
                 Usuario user = new Usuario(userData);
                 await _cognitoAuthService.RegistrarAsync(userData.Email, userData.Contrasena);
                 _userRepository.CrearUsuario(user);
-                return new UsuarioDTO(user);
+                var newUser = new UsuarioDTO(user);
+                newUser.Contrasena = null;
+                return newUser;
             }
             catch (Exception ex)
             {
