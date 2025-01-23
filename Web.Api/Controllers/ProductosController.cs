@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model.Entity;
+using Service;
 using Service.Interfaces;
+using System.Security.AccessControl;
 
 namespace Web.Api.Controllers
 {
@@ -118,6 +120,25 @@ namespace Web.Api.Controllers
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{idProducto}/imagen")]
+        public async Task<ActionResult> SubirImagenProducto(int idProducto, IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+            {
+                return BadRequest("No se cargo imagen.");
+            }
+
+            try
+            {
+                var imagenUrl = await _productoService.SubirImagenAsync( imagen.OpenReadStream(), imagen.FileName, idProducto, imagen.ContentType);
+                return Ok($"Imagen de producto '{idProducto}' subida con exito. Encontrada en {imagenUrl}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
     }
