@@ -66,7 +66,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost]
         public ActionResult CrearCategoria(CategoriaDTO categoriaDTO)
         {
@@ -80,7 +80,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public ActionResult ActualizarCategoria(int id, CategoriaDTO categoriaDTO)
         {
@@ -98,7 +98,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public ActionResult EliminarCategoria(int id)
         {

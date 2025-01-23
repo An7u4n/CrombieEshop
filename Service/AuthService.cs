@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Repository.Interfaces;
+﻿using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Model.DTO;
 using Model.Entity;
 using Service.Interfaces;
+using System.Net.WebSockets;
 
 namespace Service
 {
     public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _userRepository;
+        private readonly ICognitoAuthService _cognitoAuthService;
         private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
-        public AuthService(IUsuarioRepository usuarioRepository)
+        public AuthService(IUsuarioRepository usuarioRepository,ICognitoAuthService cognitoAuthService)
         {
             _userRepository = usuarioRepository;
+            _cognitoAuthService = cognitoAuthService;
         }
         // Should fetch user via email/username and password
         public UsuarioDTO LoginUsuario(AuthDTO userData)
@@ -42,11 +41,21 @@ namespace Service
             return new UsuarioDTO(user);
         }
 
-        public UsuarioDTO RegistrarUsuario(UsuarioDTO userData)
+        public async Task<UsuarioDTO> RegistrarUsuario(UsuarioDTO userData)
         {
-            Usuario user = new Usuario(userData);
-            _userRepository.CrearUsuario(user);
-            return new UsuarioDTO(user);
+            try
+            {
+                Usuario user = new Usuario(userData);
+                await _cognitoAuthService.RegistrarAsync(userData.Email, userData.Contrasena);
+                _userRepository.CrearUsuario(user);
+                var newUser = new UsuarioDTO(user);
+                newUser.Contrasena = null;
+                return newUser;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

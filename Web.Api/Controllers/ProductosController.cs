@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
 using Model.Entity;
+using Service;
 using Service.Interfaces;
+using System.Security.AccessControl;
 
 namespace Web.Api.Controllers
 {
@@ -60,7 +62,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}/categoria/{idCategoria}")]
         public ActionResult<ProductoDTO> AddCategoria(int id, int idCategoria)
         {
@@ -74,7 +76,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost]
         public ActionResult CrearProducto(ProductoDTO productoDTO)
         {
@@ -88,7 +90,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public ActionResult ActualizarProducto(int id, ProductoDTO productoDTO)
         {
@@ -106,7 +108,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public ActionResult EliminarProducto(int id)
         {
@@ -118,6 +120,25 @@ namespace Web.Api.Controllers
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpPost("{idProducto}/imagen")]
+        public async Task<ActionResult> SubirImagenProducto(int idProducto, IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+            {
+                return BadRequest("No se cargo imagen.");
+            }
+
+            try
+            {
+                var imagenUrl = await _productoService.SubirImagenAsync( imagen.OpenReadStream(), imagen.FileName, idProducto, imagen.ContentType);
+                return Ok($"Imagen de producto '{idProducto}' subida con exito. Encontrada en {imagenUrl}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
     }

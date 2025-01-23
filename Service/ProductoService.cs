@@ -2,6 +2,7 @@
 using Model.DTO;
 using Model.Entity;
 using Service.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Service
 {
@@ -9,10 +10,12 @@ namespace Service
     {
         private readonly IProductoRepository _productoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
-        public ProductoService(IProductoRepository productoRepository, ICategoriaRepository categoriaRepository)
+        private readonly IS3Service _s3Service;
+        public ProductoService(IProductoRepository productoRepository, ICategoriaRepository categoriaRepository, IS3Service s3Service)
         {
             _productoRepository = productoRepository;
             _categoriaRepository = categoriaRepository;
+            _s3Service = s3Service;
         }
 
         public ICollection<ProductoDTO> ObtenerProductos()
@@ -98,6 +101,38 @@ namespace Service
             producto.Categorias.Add(categoria);
             _productoRepository.ActualizarProducto(producto);
             return new ProductoDTO(producto);
+        }
+
+        public async Task<string> SubirImagenAsync(Stream fileStream, string fileName, int idProducto, string contentType)
+        {
+            try
+            {
+                var mimeValidos = new[] { "image/jpeg", "image/png", "image/gif" };
+
+                if (!mimeValidos.Contains(contentType))
+                {
+                    throw new InvalidOperationException("El archivo no es una imagen válida.");
+                }
+
+                var producto = _productoRepository.ObtenerProducto(idProducto);
+                if(producto == null) throw new Exception("Producto no encontrado");
+
+                var fileKey = Get3Key(fileName, idProducto);
+                var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
+
+                producto.UrlFotos.Add(imagenUrl);
+                _productoRepository.ActualizarProducto(producto);
+                return imagenUrl;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Error al subir imagen: " + ex.Message);
+            }
+        }
+
+        private static string Get3Key(string fileName, int idProducto)
+        {
+            return $"productos/{idProducto}/{fileName}";
         }
     }
 }
