@@ -107,6 +107,13 @@ namespace Service
         {
             try
             {
+                var mimeValidos = new[] { "image/jpeg", "image/png", "image/gif" };
+
+                if (!mimeValidos.Contains(contentType))
+                {
+                    throw new InvalidOperationException("El archivo no es una imagen válida.");
+                }
+
                 var producto = _productoRepository.ObtenerProducto(idProducto);
                 if(producto == null) throw new Exception("Producto no encontrado");
 
