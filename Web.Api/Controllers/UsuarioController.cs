@@ -15,7 +15,7 @@ namespace Web.Api.Controllers
         {
             _usuarioService = usuarioService;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet]
         public ActionResult<ICollection<UsuarioDTO>> ObtenerUsuarios()
         {
@@ -29,7 +29,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost]
         public ActionResult CrearUsuario(UsuarioDTO usuario)
         {
@@ -43,7 +43,7 @@ namespace Web.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public ActionResult ActualizarUsuario(int id, UsuarioDTO usuario)
         {
@@ -66,7 +66,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("{id}")]
         public ActionResult<UsuarioDTO> ObtenerUsuario(int id)
         {
@@ -80,7 +80,7 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public ActionResult EliminarUsuario(int id)
         {

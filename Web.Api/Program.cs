@@ -73,6 +73,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true
     };
 });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminPolicy", policy =>
+        policy.RequireClaim("cognito:groups", "Admin"));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     // SQL Server
