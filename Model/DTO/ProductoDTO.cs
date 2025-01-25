@@ -10,6 +10,7 @@ namespace Model.DTO
         public string Descripcion { get; set; }
         public double Precio { get; set; }
 
+        public List<string>? UrlImagenesProducto { get; set; } = new List<string>();
         public List<CategoriaDTO>? Categorias { get; set; } = new List<CategoriaDTO>();
 
         public ProductoDTO() { }
@@ -21,6 +22,7 @@ namespace Model.DTO
             Descripcion = producto.Descripcion;
             Precio = producto.Precio;
             Categorias = producto.Categorias.Select(c => new CategoriaDTO(c)).ToList();
+            UrlImagenesProducto = producto.ImagenesProducto.Select(i => i.UrlImagen).ToList();
         }
     }
 }

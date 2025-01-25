@@ -16,6 +16,7 @@ namespace Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<WishListItem> WishListsItems { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<ProductoImagen> ProductoImagenes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,18 +31,6 @@ namespace Data
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
                 usuario.HasIndex(u => u.Email).IsUnique();
                 usuario.Property(u => u.Role).IsRequired().HasDefaultValue(Role.User);
-                //var hasher = new PasswordHasher<Usuario>();
-                //var adminUser = new Usuario
-                //{
-                //    Id = 1,
-                //    NombreDeUsuario = "admin",
-                //    Nombre = "Administrador",
-                //    Email = "admin@admin.com",
-                //    Role = Role.Admin,
-                //    Contrasena = hasher.HashPassword(null, "admin") // Note: passing null as first parameter
-                //};
-
-                //usuario.HasData(adminUser);
             });
 
             modelBuilder.Entity<Producto>(producto =>
@@ -52,13 +41,9 @@ namespace Data
                 producto.Property(p => p.Descripcion).HasMaxLength(512).IsRequired();
                 producto.Property(p => p.Precio).IsRequired();
                 producto.HasMany(p => p.Categorias).WithMany(c => c.Productos);
-                producto
-                .Property(p => p.UrlFotos)
-                .HasConversion(
-                    v => string.Join(';', v),
-                    v => v.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList()
-                );
+                producto.HasMany(p => p.ImagenesProducto).WithOne(pi => pi.Producto).HasForeignKey(pi => pi.ProductoId);
             });
+
             modelBuilder.Entity<Categoria>(c =>
             {
                 c.ToTable("Categorias");
@@ -66,6 +51,7 @@ namespace Data
                 c.Property(c => c.Nombre).HasMaxLength(80).IsRequired();
                 c.HasIndex(c => c.Nombre).IsUnique();
             });
+
             modelBuilder.Entity<WishListItem>(wishListItems =>
             {
                 wishListItems.ToTable("WishListItems");
@@ -73,6 +59,14 @@ namespace Data
                 wishListItems.HasOne(wli => wli.Usuario).WithMany(u => u.WishListItems).HasForeignKey(wli => wli.UsuarioId);
                 wishListItems.HasOne(wli => wli.Producto).WithOne().HasForeignKey<WishListItem>(wli => wli.ProductoId);
                 wishListItems.Property(wli => wli.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+            modelBuilder.Entity<ProductoImagen>(productoImagen =>
+            {
+                productoImagen.ToTable("ProductoImagenes");
+                productoImagen.HasKey(pi => pi.Id);
+                productoImagen.Property(pi => pi.UrlImagen).HasMaxLength(512).IsRequired();
+                productoImagen.HasOne(pi => pi.Producto).WithMany(p => p.ImagenesProducto).HasForeignKey(pi => pi.ProductoId);
             });
         }
     }

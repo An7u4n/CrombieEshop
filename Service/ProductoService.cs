@@ -120,7 +120,7 @@ namespace Service
                 var fileKey = Get3Key(fileName, idProducto);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
 
-                producto.UrlFotos.Add(imagenUrl);
+                producto.ImagenesProducto.Add(new ProductoImagen(producto, imagenUrl));
                 _productoRepository.ActualizarProducto(producto);
                 return imagenUrl;
             }

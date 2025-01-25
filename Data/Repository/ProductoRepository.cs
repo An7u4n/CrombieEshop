@@ -16,12 +16,12 @@ namespace Data.Repository
 
         public ICollection<Producto> ObtenerProductos()
         {
-            return _context.Productos.Include(p => p.Categorias).ToList();
+            return _context.Productos.Include(p => p.Categorias).Include(p => p.ImagenesProducto).ToList();
         }
 
         public Producto ObtenerProducto(int idProducto)
         {
-            return _context.Productos.Include(p => p.Categorias).FirstOrDefault(p => p.Id == idProducto);
+            return _context.Productos.Include(p => p.Categorias).Include(p => p.ImagenesProducto).FirstOrDefault(p => p.Id == idProducto);
         }
 
         public Producto CrearProducto(Producto producto)
