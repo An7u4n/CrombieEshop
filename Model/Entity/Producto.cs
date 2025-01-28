@@ -9,7 +9,7 @@ namespace Model.Entity
         public string NombreProducto { get; set; }
         public string Descripcion { get; set; }
         public double Precio { get; set; }
-        public List<string> UrlFotos { get; set; } = new List<string>();
+        public virtual List<ProductoImagen> ImagenesProducto { get; set; } = new List<ProductoImagen>();
         public virtual List<Categoria> Categorias { get; set; } = [];
         
         public Producto() { }
