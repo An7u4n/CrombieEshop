@@ -49,7 +49,7 @@ namespace Data.Repository
             int page = parametros.Page ?? 1;
             page = Math.Max(page, 1);
             int pageSize = parametros.PageSize ?? DEFAULT_PAGE_SIZE;
-            var query = _context.Productos.AsQueryable();
+            var query = _context.Productos.Include(p => p.ImagenesProducto).AsQueryable();
             if (!string.IsNullOrEmpty(parametros.NombreProducto))
             {
                 query = query.Where(p => p.NombreProducto.Contains(parametros.NombreProducto));
