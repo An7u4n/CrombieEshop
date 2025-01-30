@@ -39,7 +39,7 @@ namespace Service
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return GetS3Url(fileKey);
+                    return GeneratePresignedURL(fileKey);
                 }
                 else
                 {
@@ -50,6 +50,26 @@ namespace Service
             {
                 throw new Exception($"Error al subir imagen: {ex.Message}");
             }
+        }
+        public string GeneratePresignedURL(string objectKey)
+        {
+            string urlString = string.Empty;
+            try
+            {
+                var request = new GetPreSignedUrlRequest()
+                {
+                    BucketName = _bucketName,
+                    Key = objectKey,
+                    Expires = DateTime.UtcNow.AddMinutes(PRESIGNED_URL_DURATION),
+                };
+                urlString = _client.GetPreSignedURL(request);
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"Error:'{ex.Message}'");
+            }
+
+            return urlString;
         }
 
         private string GetS3Url(string fileKey)

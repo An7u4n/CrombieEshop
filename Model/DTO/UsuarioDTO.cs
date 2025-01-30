@@ -23,7 +23,6 @@ namespace Model.DTO
             NombreDeUsuario = usuario.NombreDeUsuario;
             Nombre = usuario.Nombre;
             Email = usuario.Email;
-            FotoPerfilUrl = usuario.Imagen?.FotoPerfilUrl ?? "";
         }
     }
 }

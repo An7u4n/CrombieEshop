@@ -25,7 +25,7 @@ namespace Service
 
             if (productos == null) throw new Exception("No se han encontrado productos");
 
-            productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
+            productosDTO = productos.Select(p => GetProductoDTO(p)).ToList();
 
             return productosDTO;
         }
@@ -39,7 +39,7 @@ namespace Service
                 throw new Exception("Producto no encontrado");
             }
 
-            var productoDTO = new ProductoDTO(producto);
+            var productoDTO = GetProductoDTO(producto);
 
             return productoDTO;
         }
@@ -83,7 +83,14 @@ namespace Service
 
         public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
         {
-            return _productoRepository.BuscarProductos(parametros);
+            var productosBusqueda = _productoRepository.BuscarProductos(parametros);
+
+            return new ProductoBusquedaDTO
+            {
+                Productos = productosBusqueda.Productos.Select(p => GetProductoDTO(p)).ToList(),
+                CurrentPage = productosBusqueda.CurrentPage,
+                TotalPages = productosBusqueda.TotalPages
+            };
         }
 
         public ProductoDTO AddCategoria(int idProducto, int idCategoria)
@@ -113,7 +120,7 @@ namespace Service
                 var fileKey = Get3Key(fileName, idProducto);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
 
-                producto.ImagenesProducto.Add(new ProductoImagen(producto, imagenUrl));
+                producto.ImagenesProducto.Add(new ProductoImagen(producto, fileKey));
                 _productoRepository.ActualizarProducto(producto);
                 return imagenUrl;
             }
@@ -121,6 +128,13 @@ namespace Service
             {
                 throw new Exception("Error al subir imagen: " + ex.Message);
             }
+        }
+
+        private ProductoDTO GetProductoDTO(Producto p)
+        {
+            var productoDTO = new ProductoDTO(p);
+            productoDTO.UrlImagenesProducto = p.ImagenesProducto.Select(i => _s3Service.GeneratePresignedURL(i.UrlImagen)).ToList();
+            return productoDTO;
         }
 
         private static string Get3Key(string fileName, int idProducto)
