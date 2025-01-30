@@ -83,7 +83,14 @@ namespace Service
 
         public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
         {
-            return _productoRepository.BuscarProductos(parametros);
+            var productosBusqueda = _productoRepository.BuscarProductos(parametros);
+
+            return new ProductoBusquedaDTO
+            {
+                Productos = productosBusqueda.Productos.Select(p => GetProductoDTO(p)).ToList(),
+                CurrentPage = productosBusqueda.CurrentPage,
+                TotalPages = productosBusqueda.TotalPages
+            };
         }
 
         public ProductoDTO AddCategoria(int idProducto, int idCategoria)

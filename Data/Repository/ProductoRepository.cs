@@ -44,7 +44,7 @@ namespace Data.Repository
             _context.SaveChanges();
         }
 
-        public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
+        public ProductoBusqueda BuscarProductos(ProductoParametrosBusquedaDTO parametros)
         {
             int page = parametros.Page ?? 1;
             page = Math.Max(page, 1);
@@ -64,8 +64,8 @@ namespace Data.Repository
             }
             int totalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
             page = Math.Min(page, totalPages);
-            var productos = query.Skip((page - 1) * pageSize).Take(pageSize).ToList().Select(p => new ProductoDTO(p)).ToList();
-            return new ProductoBusquedaDTO
+            var productos = query.Skip((page - 1) * pageSize).Take(pageSize).ToList().ToList();
+            return new ProductoBusqueda
             {
                 Productos = productos,
                 CurrentPage = page,
