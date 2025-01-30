@@ -11,8 +11,6 @@ namespace Service
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IWishListItemsRepository _wishListItemsRepository;
-        private readonly PasswordHasher<Usuario> _passwordHasher;
-
         public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository)
         {
             _usuarioRepository = usuarioRepository;
@@ -25,8 +23,6 @@ namespace Service
                 throw new ArgumentNullException("El nombre de usuario es requerido.");
             if (usuarioDTO.Nombre == null || usuarioDTO.Nombre == string.Empty)
                 throw new ArgumentNullException("El nombre es requerido.");
-            if (usuarioDTO.Contrasena == null || usuarioDTO.Contrasena == string.Empty)
-                throw new ArgumentNullException("La contraseña es requerida.");
             if (usuarioDTO.Email == null || usuarioDTO.Email == string.Empty)
                 throw new ArgumentNullException("El email es requerido.");
 
@@ -47,8 +43,6 @@ namespace Service
                 throw new ArgumentNullException("El nombre de usuario es requerido.");
             if (usuarioDTO.Nombre == null || usuarioDTO.Nombre == string.Empty)
                 throw new ArgumentNullException("El nombre es requerido.");
-            if (usuarioDTO.Contrasena == null || usuarioDTO.Contrasena == string.Empty)
-                throw new ArgumentNullException("La contraseña es requerida.");
             if (usuarioDTO.Email == null || usuarioDTO.Email == string.Empty)
                 throw new ArgumentNullException("El email es requerido.");
 

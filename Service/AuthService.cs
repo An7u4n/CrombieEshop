@@ -12,7 +12,6 @@ namespace Service
     public class AuthService : IAuthService
     {
         private readonly IUsuarioRepository _userRepository;
-        private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
         public AuthService(IUsuarioRepository usuarioRepository)
         {
             _userRepository = usuarioRepository;

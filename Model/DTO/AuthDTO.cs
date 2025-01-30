@@ -9,7 +9,6 @@ namespace Model.DTO
 {
     public class AuthDTO
     {
-        public string? NombreUsuario { get; set; }
         public string? Email { get; set; }
         [Required]
         public string Contrasena { get; set; }
