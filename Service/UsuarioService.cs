@@ -57,7 +57,6 @@ namespace Service
             usuario.NombreDeUsuario = usuarioDTO.NombreDeUsuario;
             usuario.Nombre = usuarioDTO.Nombre;
             usuario.Email = usuarioDTO.Email;
-            usuario.Contrasena = _passwordHasher.HashPassword(usuario, usuarioDTO.Contrasena);
 
             _usuarioRepository.ActualizarUsuario(usuario);
         }
