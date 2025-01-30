@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
+using Service;
 using Service.Interfaces;
 
 namespace Web.Api.Controllers
@@ -27,20 +28,6 @@ namespace Web.Api.Controllers
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
-            }
-        }
-        [Authorize(Policy = "AdminPolicy")]
-        [HttpPost]
-        public ActionResult CrearUsuario(UsuarioDTO usuario)
-        {
-            try
-            {
-                var usuarioCreado = _usuarioService.CrearUsuario(usuario);
-                return Created("", usuarioCreado);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
             }
         }
         [Authorize(Policy = "AdminPolicy")]
@@ -110,7 +97,7 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPost("{id}/wishlist/{idProducto}")]
-        public ActionResult AgregarItemAWishList(int id,int idProducto)
+        public ActionResult AgregarItemAWishList(int id, int idProducto)
         {
             try
             {
@@ -134,6 +121,25 @@ namespace Web.Api.Controllers
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPost("{id}/imagen")]
+        public async Task<ActionResult> SubirImagenPerfil(int id, IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+            {
+                return BadRequest("No se cargo imagen.");
+            }
+
+            try
+            {
+                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, id, imagen.ContentType);
+                return Ok($"Foto de perfil subida en {url}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
     }

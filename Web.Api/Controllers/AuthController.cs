@@ -13,13 +13,11 @@ namespace Web.Api.Controllers
     {
         private readonly IUsuarioService _usuarioService;
         private readonly IAuthService _authService;
-        private readonly ICognitoAuthService _cognitoAuthService;
 
-        public AuthController(IUsuarioService userService, IAuthService authService, ICognitoAuthService cognitoAuthService)
+        public AuthController(IUsuarioService userService, IAuthService authService)
         {
             _usuarioService = userService;
             _authService = authService;
-            _cognitoAuthService = cognitoAuthService;
         }
 
         [HttpPost("register")]
@@ -27,7 +25,8 @@ namespace Web.Api.Controllers
         {
             try
             {
-                var user = await _authService.RegistrarUsuario(dto);
+                await _authService.RegistrarAsync(dto.Email, dto.Contrasena);
+                UsuarioDTO user = _usuarioService.CrearUsuario(dto);
                 return Created(user.Id.ToString(), user);
             }
             catch (Exception e)
@@ -40,7 +39,7 @@ namespace Web.Api.Controllers
         {
             try
             {
-                await _cognitoAuthService.ConfirmarRegistroAsync(dto.Email, dto.Code);
+                await _authService.ConfirmarRegistroAsync(dto.Email, dto.Code);
                 return Ok(dto.Email + " confirmado con exito");
             }
             catch (Exception e)
@@ -55,9 +54,9 @@ namespace Web.Api.Controllers
             {
                 if(authData.Email == null)
                 {
-                    return BadRequest("Invalid user or password");
+                    return BadRequest("Invalid email or password");
                 }
-                var result = await _cognitoAuthService.IniciarSesion(authData.Email, authData.Contrasena);
+                var result = await _authService.IniciarSesion(authData.Email, authData.Contrasena);
                 return Ok(result);
             }
             catch (Exception e)

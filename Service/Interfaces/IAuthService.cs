@@ -9,7 +9,8 @@ namespace Service.Interfaces
 {
     public interface IAuthService
     {
-        Task<UsuarioDTO> RegistrarUsuario(UsuarioDTO user);
-        UsuarioDTO LoginUsuario(AuthDTO user);
+        Task RegistrarAsync(string email, string password);
+        Task ConfirmarRegistroAsync(string userName, string code);
+        Task<string> IniciarSesion(string userName, string password);
     }
 }

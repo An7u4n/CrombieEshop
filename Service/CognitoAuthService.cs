@@ -9,7 +9,7 @@ using System.Net;
 
 namespace Service
 {
-    public class CognitoAuthService : ICognitoAuthService
+    public class CognitoAuthService : IAuthService
     {
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly CognitoUserPool _userPool;

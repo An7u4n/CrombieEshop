@@ -27,10 +27,13 @@ namespace Data
                 usuario.Property(u => u.NombreDeUsuario).HasMaxLength(80).IsRequired();
                 usuario.HasIndex(u => u.NombreDeUsuario).IsUnique();
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
-                usuario.Property(u => u.Contrasena).HasMaxLength(256).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
                 usuario.HasIndex(u => u.Email).IsUnique();
-                usuario.Property(u => u.Role).IsRequired().HasDefaultValue(Role.User);
+                usuario.OwnsOne(u => u.Imagen, img =>
+                {
+                    img.Property(i => i.FotoPerfilUrl).HasMaxLength(512);
+                }
+                );
             });
 
             modelBuilder.Entity<Producto>(producto =>
