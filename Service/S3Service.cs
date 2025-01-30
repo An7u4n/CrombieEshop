@@ -11,6 +11,7 @@ namespace Service
         private readonly AmazonS3Client _client;
         private readonly string _region;
         private readonly string _bucketName;
+        private const int PRESIGNED_URL_DURATION = 5;
         public S3Service(IConfiguration configuration)
         {
             var awsAccessKeyId = configuration["AWS:AccessKeyId"];
@@ -48,6 +49,26 @@ namespace Service
             {
                 throw new Exception($"Error al subir imagen: {ex.Message}");
             }
+        }
+        public string GeneratePresignedURL(string objectKey)
+        {
+            string urlString = string.Empty;
+            try
+            {
+                var request = new GetPreSignedUrlRequest()
+                {
+                    BucketName = _bucketName,
+                    Key = objectKey,
+                    Expires = DateTime.UtcNow.AddMinutes(PRESIGNED_URL_DURATION),
+                };
+                urlString = _client.GetPreSignedURL(request);
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"Error:'{ex.Message}'");
+            }
+
+            return urlString;
         }
 
         private string GetS3Url(string fileKey)
