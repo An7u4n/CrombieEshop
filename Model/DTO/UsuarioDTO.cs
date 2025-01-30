@@ -13,6 +13,8 @@ namespace Model.DTO
         public string Email { get; set; }
         [JsonIgnore]
         public Role Role { get; set; } = Role.User;
+
+        public string FotoPerfilUrl { get; set; }
         public UsuarioDTO() { }
 
         public UsuarioDTO(Usuario usuario)
@@ -21,6 +23,7 @@ namespace Model.DTO
             NombreDeUsuario = usuario.NombreDeUsuario;
             Nombre = usuario.Nombre;
             Email = usuario.Email;
+            FotoPerfilUrl = usuario.Imagen?.FotoPerfilUrl ?? "";
         }
     }
 }

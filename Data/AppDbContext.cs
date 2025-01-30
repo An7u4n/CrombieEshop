@@ -29,6 +29,11 @@ namespace Data
                 usuario.Property(u => u.Nombre).HasMaxLength(80).IsRequired();
                 usuario.Property(u => u.Email).HasMaxLength(320).IsRequired();
                 usuario.HasIndex(u => u.Email).IsUnique();
+                usuario.OwnsOne(u => u.Imagen, img =>
+                {
+                    img.Property(i => i.FotoPerfilUrl).HasMaxLength(512);
+                }
+                );
             });
 
             modelBuilder.Entity<Producto>(producto =>
