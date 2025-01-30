@@ -11,6 +11,8 @@ namespace Service
         private readonly AmazonS3Client _client;
         private readonly string _region;
         private readonly string _bucketName;
+        private static readonly int PRESIGNED_URL_DURATION = 5;
+        private static readonly string[] IMAGE_VALID_MIME_TYPES = { "image/jpeg", "image/png", "image/gif" };
         public S3Service(IConfiguration configuration)
         {
             var awsAccessKeyId = configuration["AWS:AccessKeyId"];
@@ -21,7 +23,7 @@ namespace Service
             _client = new AmazonS3Client(awsCredentials, Amazon.RegionEndpoint.GetBySystemName(_region));
         }
 
-        public async Task<string> SubirImagenAsync(Stream fileStream, string fileKey, string contentType)
+        public async Task<string> SubirArchivoAsync(Stream fileStream, string fileKey, string contentType)
         {
             try
             {
@@ -53,6 +55,15 @@ namespace Service
         private string GetS3Url(string fileKey)
         {
             return $"https://{_bucketName}.s3.{_region}.amazonaws.com/{fileKey}";
+        }
+
+        public async Task<string> SubirImagenAsync(Stream fileStream, string fileName, string contentType)
+        {
+            if (!IMAGE_VALID_MIME_TYPES.Contains(contentType))
+            {
+                throw new InvalidOperationException("El archivo no es una imagen válida.");
+            }
+            return await SubirArchivoAsync(fileStream, fileName, contentType);
         }
     }
 }

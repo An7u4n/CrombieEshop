@@ -101,13 +101,6 @@ namespace Service
         {
             try
             {
-                var mimeValidos = new[] { "image/jpeg", "image/png", "image/gif" };
-
-                if (!mimeValidos.Contains(contentType))
-                {
-                    throw new InvalidOperationException("El archivo no es una imagen válida.");
-                }
-
                 var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
                 if (usuario == null) throw new Exception("Usuario no encontrado");
 

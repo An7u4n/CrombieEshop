@@ -107,15 +107,8 @@ namespace Service
         {
             try
             {
-                var mimeValidos = new[] { "image/jpeg", "image/png", "image/gif" };
-
-                if (!mimeValidos.Contains(contentType))
-                {
-                    throw new InvalidOperationException("El archivo no es una imagen válida.");
-                }
-
                 var producto = _productoRepository.ObtenerProducto(idProducto);
-                if(producto == null) throw new Exception("Producto no encontrado");
+                if (producto == null) throw new Exception("Producto no encontrado");
 
                 var fileKey = Get3Key(fileName, idProducto);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
@@ -124,7 +117,7 @@ namespace Service
                 _productoRepository.ActualizarProducto(producto);
                 return imagenUrl;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("Error al subir imagen: " + ex.Message);
             }
