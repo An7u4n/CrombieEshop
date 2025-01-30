@@ -31,7 +31,7 @@ namespace Data
                 usuario.HasIndex(u => u.Email).IsUnique();
                 usuario.OwnsOne(u => u.Imagen, img =>
                 {
-                    img.Property(i => i.FotoPerfilUrl).HasMaxLength(512);
+                    img.Property(i => i.FotoPerfilKey).HasMaxLength(64);
                 }
                 );
             });

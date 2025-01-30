@@ -8,12 +8,12 @@ namespace Model.Entity
 {
     public class UsuarioImagen
     {
-        public string FotoPerfilUrl { get; set; }
+        public string FotoPerfilKey { get; set; }
 
         public UsuarioImagen() { }
-        public UsuarioImagen(string url)
+        public UsuarioImagen(string key)
         {
-            FotoPerfilUrl = url;
+            FotoPerfilKey = key;
         }
     }
 }

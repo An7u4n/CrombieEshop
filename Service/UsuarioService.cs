@@ -85,7 +85,7 @@ namespace Service
             var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
             if (usuario == null)
                 throw new Exception("Usuario no encontrado.");
-            return new UsuarioDTO(usuario);
+            return GetUsuarioDTO(usuario);
         }
 
         public ICollection<UsuarioDTO> ObtenerUsuarios()
@@ -93,7 +93,7 @@ namespace Service
             var usuarios = _usuarioRepository.ObtenerUsuarios();
             if (usuarios == null)
                 throw new Exception("No se han encontrado usuarios.");
-            var usuariosDTO = usuarios.Select(u => new UsuarioDTO(u)).ToList();
+            var usuariosDTO = usuarios.Select(u => GetUsuarioDTO(u)).ToList();
             return usuariosDTO;
         }
 
@@ -111,10 +111,10 @@ namespace Service
                 var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
                 if (usuario == null) throw new Exception("Usuario no encontrado");
 
-                var fileKey = Get3Key(fileName, idUsuario);
+                var fileKey = GetS3Key(fileName, idUsuario);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
 
-                usuario.Imagen = new UsuarioImagen(imagenUrl);
+                usuario.Imagen = new UsuarioImagen(fileKey);
                 _usuarioRepository.ActualizarUsuario(usuario);
                 return imagenUrl;
             }
@@ -123,9 +123,16 @@ namespace Service
                 throw new Exception("Error al subir imagen: " + ex.Message);
             }
         }
-        private static string Get3Key(string fileName, int idUsuario)
+        private UsuarioDTO GetUsuarioDTO(Usuario u)
+        {
+            var user = new UsuarioDTO(u);
+            user.FotoPerfilUrl = _s3Service.GeneratePresignedURL(u.Imagen.FotoPerfilKey);
+            return user;
+        }
+        private static string GetS3Key(string fileName, int idUsuario)
         {
             return $"usuarios/{idUsuario}/{fileName}";
         }
+
     }
 }

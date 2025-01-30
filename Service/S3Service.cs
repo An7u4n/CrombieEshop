@@ -38,7 +38,7 @@ namespace Service
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return GetS3Url(fileKey);
+                    return GeneratePresignedURL(fileKey);
                 }
                 else
                 {
