@@ -30,20 +30,6 @@ namespace Web.Api.Controllers
             }
         }
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPost]
-        public ActionResult CrearUsuario(UsuarioDTO usuario)
-        {
-            try
-            {
-                var usuarioCreado = _usuarioService.CrearUsuario(usuario);
-                return Created("", usuarioCreado);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public ActionResult ActualizarUsuario(int id, UsuarioDTO usuario)
         {
