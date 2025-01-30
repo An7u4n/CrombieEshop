@@ -1,9 +1,9 @@
-﻿using Data.Repository.Interfaces;
+﻿using Data.Repository;
+using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Model.DTO;
 using Model.Entity;
 using Service.Interfaces;
-
 
 namespace Service
 {
@@ -11,10 +11,12 @@ namespace Service
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IWishListItemsRepository _wishListItemsRepository;
-        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository)
+        private readonly IS3Service _s3Service;
+        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service)
         {
             _usuarioRepository = usuarioRepository;
             _wishListItemsRepository = wishListItemsRepository;
+            _s3Service = s3Service;
         }
 
         public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
@@ -93,6 +95,37 @@ namespace Service
                 throw new Exception("No se han encontrado usuarios.");
             var usuariosDTO = usuarios.Select(u => new UsuarioDTO(u)).ToList();
             return usuariosDTO;
+        }
+
+        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, int idUsuario, string contentType)
+        {
+            try
+            {
+                var mimeValidos = new[] { "image/jpeg", "image/png", "image/gif" };
+
+                if (!mimeValidos.Contains(contentType))
+                {
+                    throw new InvalidOperationException("El archivo no es una imagen válida.");
+                }
+
+                var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
+                if (usuario == null) throw new Exception("Usuario no encontrado");
+
+                var fileKey = Get3Key(fileName, idUsuario);
+                var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
+
+                usuario.Imagen = new UsuarioImagen(imagenUrl);
+                _usuarioRepository.ActualizarUsuario(usuario);
+                return imagenUrl;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al subir imagen: " + ex.Message);
+            }
+        }
+        private static string Get3Key(string fileName, int idUsuario)
+        {
+            return $"usuarios/{idUsuario}/{fileName}";
         }
     }
 }
