@@ -132,7 +132,6 @@ namespace Service
             }
             return user;
         }
-
         private static string GetS3Key(string fileName, int idUsuario)
         {
             return $"usuarios/{idUsuario}/{fileName}";

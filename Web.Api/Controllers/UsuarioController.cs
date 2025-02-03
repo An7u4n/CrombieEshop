@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amazon.S3;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
@@ -13,10 +14,12 @@ namespace Web.Api.Controllers
     {
         private readonly IUsuarioService _usuarioService;
         private readonly IAuthService _authService;
-        public UsuarioController(IUsuarioService usuarioService, IAuthService authService)
+        private readonly IS3Service _s3Service;
+        public UsuarioController(IUsuarioService usuarioService, IAuthService authService, IS3Service s3Service)
         {
             _usuarioService = usuarioService;
             _authService = authService;
+            _s3Service = s3Service;
         }
         [Authorize(Policy = "AdminPolicy")]
         [HttpGet]
@@ -55,7 +58,6 @@ namespace Web.Api.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("{id}")]
         public ActionResult<UsuarioDTO> ObtenerUsuario(int id)
         {
@@ -67,6 +69,24 @@ namespace Web.Api.Controllers
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+        [HttpGet("{id}/foto-perfil")]
+        public async Task<IActionResult> ObtenerFotoPerfil(int id)
+        {
+            try
+            {
+                var imgKey = _usuarioService.ObtenerFotoPerfilKey(id);
+                var (stream, contentType) = await _s3Service.ObtenerArchivoAsync(imgKey);
+                return File(stream, contentType);
+            }
+            catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return NotFound("Image not found");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error retrieving image: {ex.Message}");
             }
         }
         [Authorize(Policy = "AdminPolicy")]
@@ -139,7 +159,7 @@ namespace Web.Api.Controllers
                 var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
                 var usuario = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
-                if(usuario.Id != id)
+                if (usuario.Id != id)
                 {
                     return Unauthorized("No tienes permiso para subir imagen a este usuario.");
                 }

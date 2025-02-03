@@ -85,5 +85,24 @@ namespace Service
             }
             return await SubirArchivoAsync(fileStream, fileName, contentType);
         }
+        public async Task<(Stream, string)> ObtenerArchivoAsync(string fileKey)
+        {
+            try
+            {
+                var request = new GetObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = fileKey
+                };
+
+                var response = await _client.GetObjectAsync(request);
+                return (response.ResponseStream, response.Headers["Content-Type"]);
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"Error fetching file: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
