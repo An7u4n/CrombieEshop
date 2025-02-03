@@ -91,7 +91,7 @@ namespace Web.Api.Controllers
         }
         [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
-        public ActionResult EliminarUsuario(int id)
+        async public Task<ActionResult> EliminarUsuario(int id)
         {
             try
             {
