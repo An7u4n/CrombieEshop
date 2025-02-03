@@ -103,7 +103,7 @@ namespace Service
                 throw new Exception("Usuario no encontrado.");
             return GetUsuarioDTO(usuario);
         }
-        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, int userId, string userAccessToken)
+        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, int userId)
         {
             try
             {

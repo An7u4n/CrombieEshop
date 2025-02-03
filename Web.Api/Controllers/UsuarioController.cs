@@ -143,7 +143,7 @@ namespace Web.Api.Controllers
                 {
                     return Unauthorized("No tienes permiso para subir imagen a este usuario.");
                 }
-                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, usuario.Id, accessToken);
+                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, usuario.Id);
                 var imgKey = _usuarioService.ObtenerFotoPerfilKey(usuario.Id);
                 bool img = await _authService.ActualizarImagenPerfilKey(accessToken, imgKey);
                 return Ok($"Foto de perfil subida en {url}");
