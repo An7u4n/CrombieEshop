@@ -69,7 +69,7 @@ namespace Service
             _productoRepository.ActualizarProducto(producto);
         }
 
-        public void EliminarProducto(int idProducto)
+        async public Task EliminarProducto(int idProducto)
         {
             var producto = _productoRepository.ObtenerProducto(idProducto);
 
@@ -79,6 +79,7 @@ namespace Service
             }
 
             _productoRepository.EliminarProducto(producto.Id);
+            await _s3Service.EliminarCarpetaAsync(GetProductoKeyFolder(producto.Id));
         }
 
         public ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros)
@@ -117,7 +118,7 @@ namespace Service
                 var producto = _productoRepository.ObtenerProducto(idProducto);
                 if (producto == null) throw new Exception("Producto no encontrado");
 
-                var fileKey = Get3Key(fileName, idProducto);
+                var fileKey = GetS3Key(fileName, idProducto);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
 
                 producto.ImagenesProducto.Add(new ProductoImagen(producto, fileKey));
@@ -137,9 +138,13 @@ namespace Service
             return productoDTO;
         }
 
-        private static string Get3Key(string fileName, int idProducto)
+        private static string GetS3Key(string fileName, int idProducto)
         {
             return $"productos/{idProducto}/{fileName}";
+        }
+        private static string GetProductoKeyFolder(int idProducto)
+        {
+            return $"productos/{idProducto}";
         }
     }
 }

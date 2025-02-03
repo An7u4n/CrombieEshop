@@ -5,7 +5,7 @@ namespace Service.Interfaces
     public interface IProductoService
     {
         void ActualizarProducto(ProductoDTO productoDTO);
-        void EliminarProducto(int idProducto);
+        Task EliminarProducto(int idProducto);
         ProductoDTO CrearProducto(ProductoDTO productoDTO);
         ProductoBusquedaDTO BuscarProductos(ProductoParametrosBusquedaDTO parametros);
 

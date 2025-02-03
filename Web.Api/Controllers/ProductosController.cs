@@ -110,11 +110,11 @@ namespace Web.Api.Controllers
         }
         [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
-        public ActionResult EliminarProducto(int id)
+        async public Task<ActionResult> EliminarProducto(int id)
         {
             try
             {
-                _productoService.EliminarProducto(id);
+                await _productoService.EliminarProducto(id);
                 return Ok("Producto eliminado correctamente");
             }
             catch (Exception ex)
