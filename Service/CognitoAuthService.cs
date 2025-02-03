@@ -113,7 +113,7 @@ namespace Service
             }
         }
 
-        public async Task<bool> SubirImagenPerfilAsync(string accessToken, string imagenUrl)
+        public async Task<bool> ActualizarImagenPerfilKey(string accessToken, string imagenKey)
         {
             try
             {
@@ -125,7 +125,7 @@ namespace Service
                         new AttributeType
                         {
                             Name = "picture",
-                            Value = imagenUrl
+                            Value = imagenKey
                         }
                     }
                 };

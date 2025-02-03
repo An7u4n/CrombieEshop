@@ -13,7 +13,7 @@ namespace Service.Interfaces
         Task RegistrarAsync(string email, string password);
         Task ConfirmarRegistroAsync(string userName, string code);
         Task<string> IniciarSesion(string userName, string password);
-        Task<bool> SubirImagenPerfilAsync(string userName, string imagenUrl);
+        Task<bool> ActualizarImagenPerfilKey(string userName, string imagenKey);
         Task<UserInfoDTO> ObtenerUsuarioDesdeAccessToken(string accessToken);
     }
 }

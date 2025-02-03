@@ -41,9 +41,6 @@ namespace Service
         {
             var usuario = _usuarioRepository.ObtenerUsuario(usuarioDTO.Id);
 
-            if (usuario == null)
-                throw new Exception("El usuario no existe.");
-
             if (usuarioDTO.NombreDeUsuario == null || usuarioDTO.NombreDeUsuario == string.Empty)
                 throw new ArgumentNullException("El nombre de usuario es requerido.");
             if (usuarioDTO.Nombre == null || usuarioDTO.Nombre == string.Empty)
@@ -99,20 +96,23 @@ namespace Service
             var usuariosDTO = usuarios.Select(u => GetUsuarioDTO(u)).ToList();
             return usuariosDTO;
         }
-
-        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, string accessToken)
+        public UsuarioDTO ObtenerUsuarioPorEmail(string email)
+        {
+            var usuario = _usuarioRepository.FindByEmail(email);
+            if (usuario == null)
+                throw new Exception("Usuario no encontrado.");
+            return GetUsuarioDTO(usuario);
+        }
+        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, int userId, string userAccessToken)
         {
             try
             {
-                var usuarioCognito = await _cognitoService.ObtenerUsuarioDesdeAccessToken(accessToken);
-                var usuario = _usuarioRepository.FindByEmail(usuarioCognito.Attributes["email"]);
+                var usuario = _usuarioRepository.ObtenerUsuario(userId);
                 if (usuario == null) throw new Exception("Usuario no encontrado");
 
-                var fileKey = GetS3Key(fileName, usuario.Id);
+                var fileKey = ObtenerFotoPerfilKey(usuario.Id);
+
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
-
-                var imagenSubida = await _cognitoService.SubirImagenPerfilAsync(accessToken, fileKey);
-
                 usuario.Imagen = new UsuarioImagen(fileKey);
                 _usuarioRepository.ActualizarUsuario(usuario);
                 return imagenUrl;
@@ -121,18 +121,25 @@ namespace Service
             {
                 throw new Exception("Error al subir imagen: " + ex.Message);
             }
-        }        
+        }
 
-        private UsuarioDTO GetUsuarioDTO(Usuario u)
+        UsuarioDTO GetUsuarioDTO(Usuario u)
         {
             var user = new UsuarioDTO(u);
-            user.FotoPerfilUrl = _s3Service.GeneratePresignedURL(u.Imagen.FotoPerfilKey);
+            if (u.Imagen != null)
+            {
+                user.FotoPerfilUrl = _s3Service.GeneratePresignedURL(u.Imagen.FotoPerfilKey);
+            }
             return user;
         }
 
         private static string GetS3Key(string fileName, int idUsuario)
         {
-            return $"usuarios/{idUsuario}";
+            return $"usuarios/{idUsuario}/{fileName}";
+        }
+        public string ObtenerFotoPerfilKey(int idUsuario)
+        {
+            return GetS3Key("foto-perfil", idUsuario);
         }
     }
 }

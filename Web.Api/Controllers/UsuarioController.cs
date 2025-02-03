@@ -12,9 +12,11 @@ namespace Web.Api.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
-        public UsuarioController(IUsuarioService usuarioService)
+        private readonly IAuthService _authService;
+        public UsuarioController(IUsuarioService usuarioService, IAuthService authService)
         {
             _usuarioService = usuarioService;
+            _authService = authService;
         }
         [Authorize(Policy = "AdminPolicy")]
         [HttpGet]
@@ -124,8 +126,8 @@ namespace Web.Api.Controllers
             }
         }
         [Authorize]
-        [HttpPost("/imagen")]
-        public async Task<ActionResult> SubirImagenPerfil(IFormFile imagen)
+        [HttpPut("{id}/imagen")]
+        public async Task<ActionResult> SubirImagenPerfil(int id, IFormFile imagen)
         {
             if (imagen == null || imagen.Length == 0)
             {
@@ -135,7 +137,15 @@ namespace Web.Api.Controllers
             try
             {
                 var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, accessToken);
+                var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
+                var usuario = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
+                if(usuario.Id != id)
+                {
+                    return Unauthorized("No tienes permiso para subir imagen a este usuario.");
+                }
+                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, usuario.Id, accessToken);
+                var imgKey = _usuarioService.ObtenerFotoPerfilKey(usuario.Id);
+                bool img = await _authService.ActualizarImagenPerfilKey(accessToken, imgKey);
                 return Ok($"Foto de perfil subida en {url}");
             }
             catch (Exception ex)
