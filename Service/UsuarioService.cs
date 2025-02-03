@@ -1,4 +1,5 @@
-﻿using Data.Repository;
+﻿using Amazon.CognitoIdentityProvider.Model;
+using Data.Repository;
 using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Model.DTO;
@@ -12,11 +13,13 @@ namespace Service
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IWishListItemsRepository _wishListItemsRepository;
         private readonly IS3Service _s3Service;
-        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service)
+        private readonly IAuthService _cognitoService;
+        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service, IAuthService authService)
         {
             _usuarioRepository = usuarioRepository;
             _wishListItemsRepository = wishListItemsRepository;
             _s3Service = s3Service;
+            _cognitoService = authService;
         }
 
         public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
@@ -97,15 +100,18 @@ namespace Service
             return usuariosDTO;
         }
 
-        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, int idUsuario, string contentType)
+        async public Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, string accessToken)
         {
             try
             {
-                var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
+                var usuarioCognito = await _cognitoService.ObtenerUsuarioDesdeAccessToken(accessToken);
+                var usuario = _usuarioRepository.FindByEmail(usuarioCognito.Attributes["email"]);
                 if (usuario == null) throw new Exception("Usuario no encontrado");
 
-                var fileKey = GetS3Key(fileName, idUsuario);
+                var fileKey = GetS3Key(fileName, usuario.Id);
                 var imagenUrl = await _s3Service.SubirImagenAsync(fileStream, fileKey, contentType);
+
+                var imagenSubida = await _cognitoService.SubirImagenPerfilAsync(accessToken, fileKey);
 
                 usuario.Imagen = new UsuarioImagen(fileKey);
                 _usuarioRepository.ActualizarUsuario(usuario);
@@ -115,17 +121,18 @@ namespace Service
             {
                 throw new Exception("Error al subir imagen: " + ex.Message);
             }
-        }
+        }        
+
         private UsuarioDTO GetUsuarioDTO(Usuario u)
         {
             var user = new UsuarioDTO(u);
             user.FotoPerfilUrl = _s3Service.GeneratePresignedURL(u.Imagen.FotoPerfilKey);
             return user;
         }
+
         private static string GetS3Key(string fileName, int idUsuario)
         {
-            return $"usuarios/{idUsuario}/{fileName}";
+            return $"usuarios/{idUsuario}";
         }
-
     }
 }

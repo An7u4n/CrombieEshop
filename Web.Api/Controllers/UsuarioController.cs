@@ -124,8 +124,8 @@ namespace Web.Api.Controllers
             }
         }
         [Authorize]
-        [HttpPost("{id}/imagen")]
-        public async Task<ActionResult> SubirImagenPerfil(int id, IFormFile imagen)
+        [HttpPost("/imagen")]
+        public async Task<ActionResult> SubirImagenPerfil(IFormFile imagen)
         {
             if (imagen == null || imagen.Length == 0)
             {
@@ -134,7 +134,8 @@ namespace Web.Api.Controllers
 
             try
             {
-                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, id, imagen.ContentType);
+                var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, accessToken);
                 return Ok($"Foto de perfil subida en {url}");
             }
             catch (Exception ex)
