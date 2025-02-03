@@ -104,5 +104,48 @@ namespace Service
                 throw;
             }
         }
+        public async Task<bool> EliminarCarpetaAsync(string folderKey)
+        {
+            try
+            {
+                // Ensure folderKey ends with '/' (S3 treats prefixes like folders)
+                if (!folderKey.EndsWith("/"))
+                {
+                    folderKey += "/";
+                }
+
+                // Step 1: List all objects in the folder
+                var listRequest = new ListObjectsV2Request
+                {
+                    BucketName = _bucketName,
+                    Prefix = folderKey
+                };
+
+                var listResponse = await _client.ListObjectsV2Async(listRequest);
+
+                if (listResponse.S3Objects.Count == 0)
+                {
+                    return false;
+                }
+
+                var deleteRequest = new DeleteObjectsRequest
+                {
+                    BucketName = _bucketName,
+                    Objects = listResponse.S3Objects
+                        .Select(obj => new KeyVersion { Key = obj.Key })
+                        .ToList()
+                };
+
+                var deleteResponse = await _client.DeleteObjectsAsync(deleteRequest);
+
+                return deleteResponse.HttpStatusCode == System.Net.HttpStatusCode.OK;
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine($"Error deleting folder: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }
