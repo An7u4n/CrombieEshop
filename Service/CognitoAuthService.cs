@@ -169,5 +169,24 @@ namespace Service
                 throw new Exception($"Error al verificar el accessToken: {ex.Message}");
             }
         }
+        public async Task<bool> EliminarUsuarioAsync(string email)
+        {
+            try
+            {
+                var request = new AdminDeleteUserRequest
+                {
+                    UserPoolId = _userPool.PoolID,
+                    Username = email
+                };
+
+                var response = await _provider.AdminDeleteUserAsync(request);
+                return response.HttpStatusCode == HttpStatusCode.OK;
+            }
+            catch (AmazonCognitoIdentityProviderException ex)
+            {
+                throw new Exception($"Error al eliminar usuario: {ex.Message}");
+            }
+        }
+
     }
 }
