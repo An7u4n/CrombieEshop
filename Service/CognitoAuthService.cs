@@ -2,7 +2,9 @@
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
 using Amazon.Runtime;
+using Azure.Core;
 using Microsoft.Extensions.Configuration;
+using Model.DTO;
 using Service.Interfaces;
 using Service.Utilities;
 using System.Net;
@@ -75,7 +77,7 @@ namespace Service
                 }
                 Console.WriteLine($"{email} fue confirmado");
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception($"Error durante confirmación: {ex.Message}");
             }
@@ -99,15 +101,72 @@ namespace Service
 
                 var response = await _provider.InitiateAuthAsync(authRequest);
                 Console.WriteLine(response.AuthenticationResult);
-                if(response.HttpStatusCode != HttpStatusCode.OK)
+                if (response.HttpStatusCode != HttpStatusCode.OK)
                 {
                     throw new Exception("Error al iniciar sesión");
                 }
                 return response.AuthenticationResult.AccessToken;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Error al iniciar sesión: {ex.Message}");
+            }
+        }
+
+        public async Task<bool> ActualizarImagenPerfilKey(string accessToken, string imagenKey)
+        {
+            try
+            {
+                var request = new UpdateUserAttributesRequest
+                {
+                    AccessToken = accessToken,
+                    UserAttributes = new List<AttributeType>
+                    {
+                        new AttributeType
+                        {
+                            Name = "picture",
+                            Value = imagenKey
+                        }
+                    }
+                };
+                var response = await _provider.UpdateUserAttributesAsync(request);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al subir imagen: {ex.Message}");
+            }
+        }
+
+        public async Task<UserInfoDTO> ObtenerUsuarioDesdeAccessToken(string accessToken)
+        {
+            try
+            {
+                // Usar el método GetUser para obtener información del usuario desde el accessToken
+                var getUserRequest = new GetUserRequest
+                {
+                    AccessToken = accessToken
+                };
+
+                var getUserResponse = await _provider.GetUserAsync(getUserRequest);
+
+                // Extraer información relevante del usuario (opcional)
+                var userInfo = new UserInfoDTO
+                {
+                    Username = getUserResponse.Username,
+                    Attributes = getUserResponse.UserAttributes.ToDictionary(attr => attr.Name, attr => attr.Value)
+                };
+
+                return userInfo;
+            }
+            catch (NotAuthorizedException)
+            {
+                // Si el accessToken no es válido, lanzar una excepción
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al verificar el accessToken: {ex.Message}");
             }
         }
     }

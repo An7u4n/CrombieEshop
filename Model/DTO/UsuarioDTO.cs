@@ -14,7 +14,7 @@ namespace Model.DTO
         [JsonIgnore]
         public Role Role { get; set; } = Role.User;
 
-        public string FotoPerfilUrl { get; set; }
+        public string? FotoPerfilUrl { get; set; }
         public UsuarioDTO() { }
 
         public UsuarioDTO(Usuario usuario)
