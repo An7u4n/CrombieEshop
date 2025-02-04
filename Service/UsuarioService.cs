@@ -14,12 +14,14 @@ namespace Service
         private readonly IWishListItemsRepository _wishListItemsRepository;
         private readonly IS3Service _s3Service;
         private readonly IAuthService _cognitoService;
-        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service, IAuthService authService)
+        private readonly ICarritoItemRepository _carritoItemRepository;
+        public UsuarioService(ICarritoItemRepository carritoItemRepository,IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service, IAuthService authService)
         {
             _usuarioRepository = usuarioRepository;
             _wishListItemsRepository = wishListItemsRepository;
             _s3Service = s3Service;
             _cognitoService = authService;
+            _carritoItemRepository = carritoItemRepository;
         }
 
         public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
@@ -146,6 +148,29 @@ namespace Service
         public string ObtenerFotoPerfilKey(int idUsuario)
         {
             return GetS3Key("foto-perfil", idUsuario);
+        }
+
+        public void AgregarItemCarrito(CarritoItemDTO itemDTO)
+        {
+            _carritoItemRepository.SetProductoCarrito(itemDTO.UsuarioId,itemDTO.ProductoId,itemDTO.Cantidad);
+        }
+
+        public void AgregarItemsCarrito(ICollection<CarritoItemDTO> itemsDTO)
+        {
+            var usuarioId = itemsDTO.First().UsuarioId;
+            List<(int,int)> productos = itemsDTO.Select(i => (i.ProductoId, i.Cantidad)).ToList();
+            _carritoItemRepository.SetProductosCarrito(usuarioId, productos);
+        }
+
+        public void EliminarItemCarrito(int idUsuario, int idProducto)
+        {
+            _carritoItemRepository.EliminarProductoCarrito(idUsuario, idProducto);
+        }
+
+        public List<CarritoItemDTO> ObtenerCarrito(int idUsuario)
+        {
+            var items = _carritoItemRepository.ObtenerCarrito(idUsuario);
+            return items.Select(i => new CarritoItemDTO(i)).ToList();
         }
     }
 }

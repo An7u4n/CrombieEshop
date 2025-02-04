@@ -15,5 +15,10 @@ namespace Service.Interfaces
         void EliminarItemsWishList(int idUsuario, int idProducto);
         ICollection<ProductoDTO> ListarItemsWishList(int idUsuario);
         Task<string> SubirImagenPerfilAsync(Stream fileStream, string fileName, string contentType, int userId);
+        void AgregarItemCarrito(CarritoItemDTO itemDTO);
+        void AgregarItemsCarrito(ICollection<CarritoItemDTO> itemsDTO);
+        void EliminarItemCarrito(int idUsuario, int idProducto);
+        List<CarritoItemDTO> ObtenerCarrito(int idUsuario);
+
     }
 }

@@ -72,5 +72,11 @@ namespace Data.Repository
                 TotalPages = totalPages
             };
         }
+
+        public ICollection<Producto> ObtenerProductos(ICollection<int> idsProductos)
+        {
+            var productos = _context.Productos.Where(p => idsProductos.Contains(p.Id)).ToList();
+            return productos;
+        }
     }
 }

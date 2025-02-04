@@ -146,6 +146,64 @@ namespace Web.Api.Controllers
             }
         }
         [Authorize]
+        [HttpGet("{id}/carrito")]
+        public ActionResult<List<CarritoItemDTO>> ObtenerCarrito(int id)
+        {
+            try
+            {
+                var carrito = _usuarioService.ObtenerCarrito(id);
+                return Ok(carrito);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("{id}/carrito/{idProducto}")]
+        public ActionResult AgregarItemCarrito(int id, int idProducto, int Cantidad)
+        {
+            try
+            {
+                var itemDTO = new CarritoItemDTO { UsuarioId = id, ProductoId = idProducto, Cantidad = Cantidad };
+                _usuarioService.AgregarItemCarrito(itemDTO);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("{id}/carrito")]
+        public ActionResult AgregarItemsCarrito(int id, List<CarritoItemDTO> items)
+        {
+            try
+            {
+                items.ForEach(i => i.UsuarioId = id);
+                _usuarioService.AgregarItemsCarrito(items);
+                return Created();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpDelete("{id}/carrito/{idProducto}")]
+        public ActionResult EliminarItemCarrito(int id, int idProducto)
+        {
+            try
+            {
+                _usuarioService.EliminarItemCarrito(id, idProducto);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
         [HttpPut("{id}/imagen")]
         public async Task<ActionResult> SubirImagenPerfil(int id, IFormFile imagen)
         {

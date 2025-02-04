@@ -10,6 +10,8 @@ namespace Data.Repository.Interfaces
         Producto CrearProducto(Producto producto);
         Producto ObtenerProducto(int idProducto);
         ICollection<Producto> ObtenerProductos();
+
+        ICollection<Producto> ObtenerProductos(ICollection<int> idsProductos);
         ProductoBusqueda BuscarProductos(ProductoParametrosBusquedaDTO parametros);
     }
 }
