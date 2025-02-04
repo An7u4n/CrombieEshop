@@ -75,9 +75,10 @@ namespace Service
             return productosDTO;
         }
 
-        public void EliminarUsuario(int idUsuario)
+        async public Task EliminarUsuario(int idUsuario)
         {
             _usuarioRepository.EliminarUsuario(idUsuario);
+            await _s3Service.EliminarCarpetaAsync(GetUsuarioKeyFolder(idUsuario));
         }
 
         public UsuarioDTO ObtenerUsuario(int idUsuario)
@@ -135,6 +136,10 @@ namespace Service
         private static string GetS3Key(string fileName, int idUsuario)
         {
             return $"usuarios/{idUsuario}/{fileName}";
+        }
+        private static string GetUsuarioKeyFolder(int idUsuario)
+        {
+            return $"usuarios/{idUsuario}";
         }
         public string ObtenerFotoPerfilKey(int idUsuario)
         {

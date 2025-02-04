@@ -5,7 +5,7 @@ namespace Service.Interfaces
     public interface IUsuarioService
     {
         void ActualizarUsuario(UsuarioDTO usuarioDTO);
-        void EliminarUsuario(int idUsuario);
+        Task EliminarUsuario(int idUsuario);
         UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO);
         UsuarioDTO ObtenerUsuario(int idUsuario);
         UsuarioDTO ObtenerUsuarioPorEmail(string email);
