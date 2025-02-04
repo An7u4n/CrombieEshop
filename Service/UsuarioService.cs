@@ -3,6 +3,7 @@ using Data.Repository;
 using Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Model.DTO;
+using Model.DTO.CarritoItemDTOs;
 using Model.Entity;
 using Service.Interfaces;
 
@@ -14,12 +15,14 @@ namespace Service
         private readonly IWishListItemsRepository _wishListItemsRepository;
         private readonly IS3Service _s3Service;
         private readonly IAuthService _cognitoService;
-        public UsuarioService(IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service, IAuthService authService)
+        private readonly ICarritoItemRepository _carritoItemRepository;
+        public UsuarioService(ICarritoItemRepository carritoItemRepository,IUsuarioRepository usuarioRepository, IWishListItemsRepository wishListItemsRepository, IS3Service s3Service, IAuthService authService)
         {
             _usuarioRepository = usuarioRepository;
             _wishListItemsRepository = wishListItemsRepository;
             _s3Service = s3Service;
             _cognitoService = authService;
+            _carritoItemRepository = carritoItemRepository;
         }
 
         public UsuarioDTO CrearUsuario(UsuarioDTO usuarioDTO)
@@ -70,7 +73,8 @@ namespace Service
 
         ICollection<ProductoDTO> IUsuarioService.ListarItemsWishList(int idUsuario)
         {
-            var productos = _wishListItemsRepository.ObtenerProductosWishList(idUsuario);
+            var productos = (List<Producto>)_wishListItemsRepository.ObtenerProductosWishList(idUsuario);
+            productos.ForEach(p => p.ImagenesProducto.ForEach(i => i.UrlImagen = _s3Service.GeneratePresignedURL(i.UrlImagen)));
             var productosDTO = productos.Select(p => new ProductoDTO(p)).ToList();
             return productosDTO;
         }
@@ -146,6 +150,31 @@ namespace Service
         public string ObtenerFotoPerfilKey(int idUsuario)
         {
             return GetS3Key("foto-perfil", idUsuario);
+        }
+
+        public void AgregarItemCarrito(SetCarritoItemDTO itemDTO)
+        {
+            _carritoItemRepository.SetProductoCarrito(itemDTO.UsuarioId,itemDTO.ProductoId,itemDTO.Cantidad);
+        }
+
+        public void AgregarItemsCarrito(ICollection<SetCarritoItemDTO> itemsDTO)
+        {
+            var usuarioId = itemsDTO.First().UsuarioId;
+            List<(int,int)> productos = itemsDTO.Select(i => (i.ProductoId, i.Cantidad)).ToList();
+            _carritoItemRepository.SetProductosCarrito(usuarioId, productos);
+        }
+
+        public void EliminarItemCarrito(int idUsuario, int idProducto)
+        {
+            _carritoItemRepository.EliminarProductoCarrito(idUsuario, idProducto);
+        }
+
+        public List<CarritoItemDTO> ObtenerCarrito(int idUsuario)
+        {
+            List<CarritoItem> items = (List<CarritoItem>)_carritoItemRepository.ObtenerCarrito(idUsuario);
+            //generate presigned url for each producto in items
+            items.ForEach(i => i.Producto.ImagenesProducto.ForEach(p => p.UrlImagen = _s3Service.GeneratePresignedURL(p.UrlImagen)));
+            return items.Select(i => new CarritoItemDTO(i)).ToList();
         }
     }
 }

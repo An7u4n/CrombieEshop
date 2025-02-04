@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
+using Model.DTO.CarritoItemDTOs;
+using Model.Entity;
 using Service;
 using Service.Interfaces;
 
@@ -105,12 +107,17 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpGet("{id}/wishlist")]
-        public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
+        async public Task<ActionResult<ICollection<ProductoDTO>>> ListarItemsWishList(int id)
         {
             try
             {
-                var productos = _usuarioService.ListarItemsWishList(id);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var productos = _usuarioService.ListarItemsWishList(usuario.Id);
                 return Ok(productos);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -119,12 +126,17 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPost("{id}/wishlist/{idProducto}")]
-        public ActionResult AgregarItemAWishList(int id, int idProducto)
+        async public Task<ActionResult> AgregarItemAWishList(int id, int idProducto)
         {
             try
             {
-                _usuarioService.AgregarItemsWishList(id, idProducto);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.AgregarItemsWishList(usuario.Id, idProducto);
                 return Created();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -133,12 +145,95 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpDelete("{id}/wishlist/{idProducto}")]
-        public ActionResult EliminarItemWishList(int id, int idProducto)
+        async public Task<ActionResult> EliminarItemWishList(int id, int idProducto)
         {
             try
             {
-                _usuarioService.EliminarItemsWishList(id, idProducto);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.EliminarItemsWishList(usuario.Id, idProducto);
                 return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("{id}/carrito")]
+        async public Task<ActionResult<List<CarritoItemDTO>>> ObtenerCarrito(int id)
+        {
+            try
+            {
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var carrito = _usuarioService.ObtenerCarrito(usuario.Id);
+                return Ok(carrito);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("{id}/carrito/{idProducto}")]
+        async public Task<ActionResult> AgregarItemCarrito(int id, int idProducto, int Cantidad)
+        {
+            try
+            {
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var itemDTO = new SetCarritoItemDTO { UsuarioId = usuario.Id, ProductoId = idProducto, Cantidad = Cantidad };
+                _usuarioService.AgregarItemCarrito(itemDTO);
+                return Created();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("{id}/carrito")]
+        async public Task<ActionResult> AgregarItemsCarrito(int id, List<SetCarritoItemDTO> items)
+        {
+            try
+            {
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                items.ForEach(i => i.UsuarioId = usuario.Id);
+                _usuarioService.AgregarItemsCarrito(items);
+                return Created();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpDelete("{id}/carrito/{idProducto}")]
+        async public Task<ActionResult> EliminarItemCarrito(int id, int idProducto)
+        {
+            try
+            {
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.EliminarItemCarrito(usuario.Id, idProducto);
+                return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -156,22 +251,36 @@ namespace Web.Api.Controllers
 
             try
             {
-                var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
-                var usuario = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
-                if (usuario.Id != id)
-                {
-                    return Unauthorized("No tienes permiso para subir imagen a este usuario.");
-                }
+                var (accessToken, usuario) = await AuthorizeUser(id);
                 var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, usuario.Id);
                 var imgKey = _usuarioService.ObtenerFotoPerfilKey(usuario.Id);
                 bool img = await _authService.ActualizarImagenPerfilKey(accessToken, imgKey);
                 return Ok($"Foto de perfil subida en {url}");
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
+        private async Task<(string accessToken, UsuarioDTO userDTO)> AuthorizeUser(int id)
+        {
+            var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
+            var userDTO = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
+            if (userDTO.Id != id)
+            {
+                throw new UnauthorizedAccessException("No tienes permiso para realizar esta acción.");
+            }
+            return (accessToken, userDTO);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Data.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Model.Entity;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Data.Repository
                 throw new ArgumentException("Usuario or Producto not found.");
             }
             var existingWishListItem = _context.WishListsItems.FirstOrDefault(w => w.Usuario.Id == idUsuario && w.Producto.Id == idProducto);
-            if(existingWishListItem != null)
+            if (existingWishListItem != null)
             {
                 return;
             }
@@ -51,7 +52,9 @@ namespace Data.Repository
 
         ICollection<Producto> IWishListItemsRepository.ObtenerProductosWishList(int idUsuario)
         {
-            var productos = _context.WishListsItems.Where(w => w.Usuario.Id == idUsuario).Select(w => w.Producto).ToList();
+            var productos = _context.WishListsItems.Where(w => w.Usuario.Id == idUsuario).Include(w => w.Producto).ThenInclude(p => p.ImagenesProducto)
+                .Include(w => w.Producto).ThenInclude(p => p.Categorias)
+                .Select(w => w.Producto).ToList();
             return productos;
         }
     }
