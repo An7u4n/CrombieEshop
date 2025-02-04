@@ -30,7 +30,8 @@ namespace Data.Repository
 
         public ICollection<CarritoItem> ObtenerCarrito(int idUsuario)
         {
-            var items = _context.CarritoItems.Where(w => w.Usuario.Id == idUsuario).ToList();
+            var items = _context.CarritoItems.Where(w => w.Usuario.Id == idUsuario).Include(i => i.Producto).ThenInclude(p => p.ImagenesProducto)
+                        .Include(i => i.Producto).ThenInclude(p => p.Categorias).ToList();
             return items;
         }
 

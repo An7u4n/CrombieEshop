@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
+using Model.DTO.CarritoItemDTOs;
 using Model.Entity;
 using Service;
 using Service.Interfaces;
@@ -187,7 +188,7 @@ namespace Web.Api.Controllers
             try
             {
                 var (accessToken, usuario) = await AuthorizeUser(id);
-                var itemDTO = new CarritoItemDTO { UsuarioId = usuario.Id, ProductoId = idProducto, Cantidad = Cantidad };
+                var itemDTO = new SetCarritoItemDTO { UsuarioId = usuario.Id, ProductoId = idProducto, Cantidad = Cantidad };
                 _usuarioService.AgregarItemCarrito(itemDTO);
                 return Created();
             }
@@ -202,7 +203,7 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPut("{id}/carrito")]
-        async public Task<ActionResult> AgregarItemsCarrito(int id, List<CarritoItemDTO> items)
+        async public Task<ActionResult> AgregarItemsCarrito(int id, List<SetCarritoItemDTO> items)
         {
             try
             {
