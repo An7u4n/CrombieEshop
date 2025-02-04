@@ -155,6 +155,10 @@ namespace Web.Api.Controllers
                 var carrito = _usuarioService.ObtenerCarrito(usuario.Id);
                 return Ok(carrito);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
@@ -170,6 +174,10 @@ namespace Web.Api.Controllers
                 var itemDTO = new CarritoItemDTO { UsuarioId = usuario.Id, ProductoId = idProducto, Cantidad = Cantidad };
                 _usuarioService.AgregarItemCarrito(itemDTO);
                 return Created();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -187,6 +195,10 @@ namespace Web.Api.Controllers
                 _usuarioService.AgregarItemsCarrito(items);
                 return Created();
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
+            }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
@@ -201,6 +213,10 @@ namespace Web.Api.Controllers
                 var (accessToken, usuario) = await AuthorizeUser(id);
                 _usuarioService.EliminarItemCarrito(usuario.Id, idProducto);
                 return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
