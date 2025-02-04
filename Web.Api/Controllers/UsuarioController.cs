@@ -147,11 +147,12 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpGet("{id}/carrito")]
-        public ActionResult<List<CarritoItemDTO>> ObtenerCarrito(int id)
+        async public Task<ActionResult<List<CarritoItemDTO>>> ObtenerCarrito(int id)
         {
             try
             {
-                var carrito = _usuarioService.ObtenerCarrito(id);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var carrito = _usuarioService.ObtenerCarrito(usuario.Id);
                 return Ok(carrito);
             }
             catch (Exception ex)
@@ -161,11 +162,12 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPut("{id}/carrito/{idProducto}")]
-        public ActionResult AgregarItemCarrito(int id, int idProducto, int Cantidad)
+        async public Task<ActionResult> AgregarItemCarrito(int id, int idProducto, int Cantidad)
         {
             try
             {
-                var itemDTO = new CarritoItemDTO { UsuarioId = id, ProductoId = idProducto, Cantidad = Cantidad };
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var itemDTO = new CarritoItemDTO { UsuarioId = usuario.Id, ProductoId = idProducto, Cantidad = Cantidad };
                 _usuarioService.AgregarItemCarrito(itemDTO);
                 return Created();
             }
@@ -176,11 +178,12 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPut("{id}/carrito")]
-        public ActionResult AgregarItemsCarrito(int id, List<CarritoItemDTO> items)
+        async public Task<ActionResult> AgregarItemsCarrito(int id, List<CarritoItemDTO> items)
         {
             try
             {
-                items.ForEach(i => i.UsuarioId = id);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                items.ForEach(i => i.UsuarioId = usuario.Id);
                 _usuarioService.AgregarItemsCarrito(items);
                 return Created();
             }
@@ -191,11 +194,12 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpDelete("{id}/carrito/{idProducto}")]
-        public ActionResult EliminarItemCarrito(int id, int idProducto)
+        async public Task<ActionResult> EliminarItemCarrito(int id, int idProducto)
         {
             try
             {
-                _usuarioService.EliminarItemCarrito(id, idProducto);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.EliminarItemCarrito(usuario.Id, idProducto);
                 return Ok();
             }
             catch (Exception ex)
@@ -214,22 +218,36 @@ namespace Web.Api.Controllers
 
             try
             {
-                var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
-                var usuario = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
-                if (usuario.Id != id)
-                {
-                    return Unauthorized("No tienes permiso para subir imagen a este usuario.");
-                }
+                var (accessToken, usuario) = await AuthorizeUser(id);
                 var url = await _usuarioService.SubirImagenPerfilAsync(imagen.OpenReadStream(), imagen.Name, imagen.ContentType, usuario.Id);
                 var imgKey = _usuarioService.ObtenerFotoPerfilKey(usuario.Id);
                 bool img = await _authService.ActualizarImagenPerfilKey(accessToken, imgKey);
                 return Ok($"Foto de perfil subida en {url}");
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
             }
         }
+        private async Task<(string accessToken, UsuarioDTO userDTO)> AuthorizeUser(int id)
+        {
+            var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userInfo = await _authService.ObtenerUsuarioDesdeAccessToken(accessToken);
+            var userDTO = _usuarioService.ObtenerUsuarioPorEmail(userInfo.Attributes["email"]);
+            if (userDTO.Id != id)
+            {
+                throw new UnauthorizedAccessException("No tienes permiso para realizar esta acción.");
+            }
+            return (accessToken, userDTO);
+        }
+
     }
 }
