@@ -95,7 +95,7 @@ namespace Web.Api.Controllers
         {
             try
             {
-                _usuarioService.EliminarUsuario(id);
+                await _usuarioService.EliminarUsuario(id);
                 return Ok();
             }
             catch (Exception ex)

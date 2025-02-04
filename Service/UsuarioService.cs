@@ -77,8 +77,10 @@ namespace Service
 
         async public Task EliminarUsuario(int idUsuario)
         {
-            _usuarioRepository.EliminarUsuario(idUsuario);
-            await _s3Service.EliminarCarpetaAsync(GetUsuarioKeyFolder(idUsuario));
+            var usuario = _usuarioRepository.ObtenerUsuario(idUsuario);
+
+            _usuarioRepository.EliminarUsuario(usuario.Id);
+            await _cognitoService.EliminarUsuarioAsync(usuario.Email);
         }
 
         public UsuarioDTO ObtenerUsuario(int idUsuario)

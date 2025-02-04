@@ -15,5 +15,6 @@ namespace Service.Interfaces
         Task<string> IniciarSesion(string userName, string password);
         Task<bool> ActualizarImagenPerfilKey(string userName, string imagenKey);
         Task<UserInfoDTO> ObtenerUsuarioDesdeAccessToken(string accessToken);
+        Task<bool> EliminarUsuarioAsync(string userName);
     }
 }
