@@ -149,7 +149,7 @@ namespace Web.Api.Controllers
             try
             {
                 var (accessToken, usuario) = await AuthorizeUser(id);
-                _usuarioService.EliminarItemsWishList(usuario.id, idProducto);
+                _usuarioService.EliminarItemsWishList(usuario.Id, idProducto);
                 return Ok();
             }
             catch (UnauthorizedAccessException ex)
