@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.DTO;
+using Model.Entity;
 using Service;
 using Service.Interfaces;
 
@@ -105,12 +106,17 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpGet("{id}/wishlist")]
-        public ActionResult<ICollection<ProductoDTO>> ListarItemsWishList(int id)
+        async public Task<ActionResult<ICollection<ProductoDTO>>> ListarItemsWishList(int id)
         {
             try
             {
-                var productos = _usuarioService.ListarItemsWishList(id);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                var productos = _usuarioService.ListarItemsWishList(usuario.Id);
                 return Ok(productos);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -119,12 +125,17 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpPost("{id}/wishlist/{idProducto}")]
-        public ActionResult AgregarItemAWishList(int id, int idProducto)
+        async public Task<ActionResult> AgregarItemAWishList(int id, int idProducto)
         {
             try
             {
-                _usuarioService.AgregarItemsWishList(id, idProducto);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.AgregarItemsWishList(usuario.Id, idProducto);
                 return Created();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -133,12 +144,17 @@ namespace Web.Api.Controllers
         }
         [Authorize]
         [HttpDelete("{id}/wishlist/{idProducto}")]
-        public ActionResult EliminarItemWishList(int id, int idProducto)
+        async public Task<ActionResult> EliminarItemWishList(int id, int idProducto)
         {
             try
             {
-                _usuarioService.EliminarItemsWishList(id, idProducto);
+                var (accessToken, usuario) = await AuthorizeUser(id);
+                _usuarioService.EliminarItemsWishList(usuario.id, idProducto);
                 return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, $"Error: {ex.Message}");
             }
             catch (Exception ex)
             {
