@@ -13,6 +13,8 @@ namespace Model.Entity
         [EmailAddress] public string Email { get; set; }
         public virtual List<WishListItem> WishListItems { get; set; } = [];
 
+        public virtual List<CarritoItem> CarritoItems { get; set; } = [];
+
         public UsuarioImagen? Imagen { get; set; }
         public Usuario() { }
 

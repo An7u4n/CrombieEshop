@@ -18,8 +18,19 @@ namespace Data
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<ProductoImagen> ProductoImagenes { get; set; }
 
+        public DbSet<CarritoItem> CarritoItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CarritoItem>(carritoItem =>
+            {
+                carritoItem.ToTable("CarritoItems");
+                carritoItem.HasKey(ci => new { ci.UsuarioId, ci.ProductoId });
+                carritoItem.HasOne(ci => ci.Usuario).WithMany(u => u.CarritoItems).HasForeignKey(ci => ci.UsuarioId);
+                carritoItem.HasOne(ci => ci.Producto).WithOne().HasForeignKey<CarritoItem>(ci => ci.ProductoId);
+                carritoItem.Property(ci => ci.Cantidad).IsRequired();
+                carritoItem.Property(ci => ci.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
             modelBuilder.Entity<Usuario>(usuario =>
             {
                 usuario.ToTable("Usuarios");
