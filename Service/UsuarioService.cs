@@ -139,6 +139,10 @@ namespace Service
         {
             return $"usuarios/{idUsuario}/{fileName}";
         }
+        private static string GetUsuarioKeyFolder(int idUsuario)
+        {
+            return $"usuarios/{idUsuario}";
+        }
         public string ObtenerFotoPerfilKey(int idUsuario)
         {
             return GetS3Key("foto-perfil", idUsuario);
